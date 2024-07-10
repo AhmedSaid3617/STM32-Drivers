@@ -12,8 +12,8 @@ INCS = -I $(INC_DIR)
 LIBS = 
 SRC := $(wildcard *.c) $(wildcard $(SRC_DIR)/*.c)
 OBJ := $(addprefix $(OBJS_DIR)/, $(notdir $(SRC:.c=.o))) 
-As = $(wildcard *.s)
-AsOBJ = $(As:.s=.o)
+AS = $(wildcard *.s)
+AsOBJ = $(addprefix $(OBJS_DIR)/, $(notdir $(AS:.s=.o)))
 
 .PHONY: flash
 flash: build
@@ -25,8 +25,8 @@ build: build_dir $(PROJECT_NAME).bin
 $(OBJS_DIR)/%.o: %.c
 	$(CC)gcc $< -c $(INCS) -o $@  $(CFLAGS)
 
-%.o: %.s
-	$(CC)as $< -o $(OBJS_DIR)/$@ 
+$(OBJS_DIR)/%.o: %.s
+	$(CC)as $< -o $@ 
 
 $(PROJECT_NAME).elf: $(OBJ) $(AsOBJ)
 	$(CC)ld -T STM32F103C6TX_FLASH.ld $(AsOBJ) $(OBJ) -o $@ -Map="map_file.map"

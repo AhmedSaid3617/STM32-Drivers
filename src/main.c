@@ -1,22 +1,20 @@
-#include "GPIO.h"
+#include "gpio.h"
+#include "rcc.h"
 
-const int arr[5] = {};
+GPIO_t* gpio_c = (GPIO_t*)GPIOC_BASE;
 
 int main()
 {
-    // Enable clock for GPIOC
-    RCC_APB2ENR |= (1 << 4);
-
-    GPIOC_CRH |= (1 << 21);
-    GPIOC_CRH &= ~(0xD << 20);
-
+    RCC_PORTC_ENABLE();
+    gpio_c->CRH |= (1<<20);
+    gpio_c->ODR |= (1<<13);
     while (1)
     {
-        for (int i = 0; i < 1000000; i++);
-        GPIOC_ODR |= (1<<13);
+        gpio_c->BSRR |= (1<<13);
+        for (volatile int i = 0; i < 100000; i++);
 
-        for (int i = 0; i < 1000000; i++);
-        GPIOC_ODR &= ~(1<<13);
+        gpio_c->BSRR &= ~(1<<29);
+        for (volatile int i = 0; i < 100000; i++);
     }
 
     return 0;
