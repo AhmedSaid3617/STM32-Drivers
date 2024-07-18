@@ -9,23 +9,32 @@ GPIO_t* gpio_a = (GPIO_t*)GPIOB_BASE;
 int main()
 {
     RCC_PORTC_ENABLE();
+    gpio_c->CRH &= ~(0xF<<20);
     gpio_c->CRH |= (1<<20);
-    gpio_c->ODR |= (1<<13);
 
     RCC_PORTB_ENABLE();
+
+    // PB8 OUT
     gpio_b->CRH &= ~(0xF);
     gpio_b->CRH |= (1<<0);
-    gpio_b->ODR |= (1<<8);
+
+    //PB10 IN
+    gpio_b->CRH &= ~(0xF<<8);
+    gpio_b->CRH |= (0x8<<8);
+
 
     while (1)
     {
-        gpio_c->ODR |= (1<<13);
-        gpio_b->ODR &= ~(1<<8);
-        for (volatile int i = 0; i < 1000000; i++);
 
-        gpio_c->ODR &= ~(1<<13);
-        gpio_b->ODR |= (1<<8);
-        for (volatile int i = 0; i < 1000000; i++);
+        if (gpio_b->IDR & (1<<10))
+        {
+            gpio_b->ODR |= (1<<8);
+        }
+        else
+        {
+            gpio_b->ODR &= ~(1<<8);
+            
+        }
     } 
     return 0;
 }
