@@ -9,6 +9,12 @@
 #define GPIOC_BASE            (APB2PERIPH_BASE + 0x00001000UL)
 #define GPIOD_BASE            (APB2PERIPH_BASE + 0x00001400UL)
 
+typedef enum {
+    GPIO_MODE_INPUT,
+    GPIO_MODE_OUTPUT_10MHZ,
+    GPIO_MODE_OUTPUT_2MHZ,
+    GPIO_MODE_OUTPUT_50MHZ
+} GPIO_Mode;
 
 typedef struct
 {
@@ -20,6 +26,12 @@ typedef struct
     volatile uint32_t BRR;
     volatile uint32_t LCKR;
 } GPIO_t;
+
+typedef struct 
+{
+    /* data */
+} GPIO_init_t;
+
 
 
 #endif
