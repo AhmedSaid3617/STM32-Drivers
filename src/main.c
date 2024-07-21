@@ -1,40 +1,31 @@
 #include "gpio.h"
 #include "rcc.h"
+#include "utils.h"
 
-GPIO_t* gpio_c = (GPIO_t*)GPIOC_BASE;
-GPIO_t* gpio_b = (GPIO_t*)GPIOB_BASE;
-GPIO_t* gpio_a = (GPIO_t*)GPIOB_BASE;
-
+GPIO_t *gpio_b = (GPIO_t *)GPIOB_BASE;
 
 int main()
 {
+    RCC_PORTA_ENABLE();
     RCC_PORTC_ENABLE();
-    gpio_c->CRH &= ~(0xF<<20);
-    gpio_c->CRH |= (1<<20);
 
-    RCC_PORTB_ENABLE();
+    // PA12 OUT
+    GPIO_Init(GPIOA_BASE, 12, GPIO_MODE_OUTPUT_PP, GPIO_PULL_FLOATING);
 
-    // PB8 OUT
-    gpio_b->CRH &= ~(0xF);
-    gpio_b->CRH |= (1<<0);
-
-    //PB10 IN
-    gpio_b->CRH &= ~(0xF<<8);
-    gpio_b->CRH |= (0x8<<8);
-
+    // PC15 IN
+    GPIO_Init(GPIOC_BASE, 15, GPIO_MODE_INPUT, GPIO_PULL_UP);
 
     while (1)
     {
 
-        if (gpio_b->IDR & (1<<10))
+        if (GPIO_read_pin((GPIO_t*) GPIOC_BASE, 15))
         {
-            gpio_b->ODR |= (1<<8);
+            GPIO_write_pin(GPIOA_BASE, 12, 1);
         }
-        else
-        {
-            gpio_b->ODR &= ~(1<<8);
-            
+        else {
+            GPIO_write_pin(GPIOA_BASE, 12, 0);
         }
-    } 
+        
+    }
     return 0;
 }
