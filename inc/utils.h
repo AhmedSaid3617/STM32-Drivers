@@ -1,7 +1,10 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-#define SETBIT(data, pin) data |= (1<<pin);
-#define RESETBIT(data, pin) data &= ~(1<<pin);
+// Set a bit in a variable or register.
+#define SETBIT(data, bit) data |= (1<<bit);
+
+// Reset a bit in a variable or register.
+#define RESETBIT(data, bit) data &= ~(1<<bit);
 
 #endif
