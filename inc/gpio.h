@@ -4,12 +4,7 @@
 #include <stdint.h>
 
 #include "utils.h"
-
-#define APB2PERIPH_BASE       (0x40010000UL)
-#define GPIOA_BASE            (APB2PERIPH_BASE + 0x00000800UL)
-#define GPIOB_BASE            (APB2PERIPH_BASE + 0x00000C00UL)
-#define GPIOC_BASE            (APB2PERIPH_BASE + 0x00001000UL)
-#define GPIOD_BASE            (APB2PERIPH_BASE + 0x00001400UL)
+#include "stm32f103c6.h"
 
 typedef enum {
     GPIO_MODE_ANALOG,
@@ -32,24 +27,12 @@ typedef enum {
     GPIO_SPEED_50MHZ
 } GPIO_SPEED;
 
-typedef struct
-{
-    volatile uint32_t CRL;
-    volatile uint32_t CRH;
-    volatile uint32_t IDR;
-    volatile uint32_t ODR;
-    volatile uint32_t BSRR;
-    volatile uint32_t BRR;
-    volatile uint32_t LCKR;
-} GPIO_t;
+#define GPIOA ((GPIO_TypeDef*)(GPIOA_BASE))
+#define GPIOB ((GPIO_TypeDef*)(GPIOB_BASE))
+#define GPIOC ((GPIO_TypeDef*)(GPIOC_BASE))
 
-typedef struct 
-{
-    /* data */
-} GPIO_init_t;
-
-void GPIO_Init(GPIO_t* GPIO_BASE, int pin, GPIO_MODE mode, GPIO_PULL pull);
-uint32_t GPIO_read_pin(GPIO_t* gpio_base, uint8_t pin);
-void GPIO_write_pin(GPIO_t* gpio_base, uint8_t pin, uint8_t value);
+void GPIO_Init(GPIO_TypeDef* GPIO_BASE, int pin, GPIO_MODE mode, GPIO_PULL pull);
+uint32_t GPIO_read_pin(GPIO_TypeDef* gpio_base, uint8_t pin);
+void GPIO_write_pin(GPIO_TypeDef* gpio_base, uint8_t pin, uint8_t value);
 
 #endif

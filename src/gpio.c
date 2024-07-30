@@ -7,7 +7,7 @@
  * @param mode In/Out, Pull Push/Open Drain.
  * @param pull Input pin pull-down/pull-up/floating.
  */
-void GPIO_Init(GPIO_t* gpio_base, int pin, GPIO_MODE mode, GPIO_PULL pull){
+void GPIO_Init(GPIO_TypeDef* gpio_base, int pin, GPIO_MODE mode, GPIO_PULL pull){
     uint8_t control_data = 0;
     uint16_t odr_r = 0;
     switch (mode)
@@ -57,7 +57,7 @@ void GPIO_Init(GPIO_t* gpio_base, int pin, GPIO_MODE mode, GPIO_PULL pull){
  * @brief Read the boolean value from an input pin.
  * @return The value at the gpio port masked for this pin.
  */
-uint32_t GPIO_read_pin(GPIO_t* gpio_base, uint8_t pin){
+uint32_t GPIO_read_pin(GPIO_TypeDef* gpio_base, uint8_t pin){
     return gpio_base->IDR & (1<<pin);
 }
 
@@ -65,7 +65,7 @@ uint32_t GPIO_read_pin(GPIO_t* gpio_base, uint8_t pin){
  * @brief Write one or zero to a gpio pin configured to output.
  * @param value Value to be written to the pin, should be either 1 or 0.
  */
-void GPIO_write_pin(GPIO_t* gpio_base, uint8_t pin, uint8_t value){
+void GPIO_write_pin(GPIO_TypeDef* gpio_base, uint8_t pin, uint8_t value){
     if (value == 1)
     {
         SETBIT(gpio_base->ODR, pin);
