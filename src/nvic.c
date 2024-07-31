@@ -1,4 +1,4 @@
-#include "interrupts.h"
+#include "nvic.h"
 
 void _enable_irq(){
     __asm__("CPSIE i");

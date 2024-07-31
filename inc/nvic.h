@@ -1,5 +1,5 @@
-#ifndef INTERRUPTS_H
-#define INTERRUPTS_H
+#ifndef NVIC_H
+#define NVIC_H
 
 #include "core_m3.h"
 

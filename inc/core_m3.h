@@ -11,6 +11,6 @@
 #define NVIC_ISPR   ((volatile uint32_t*)(NVIC_BASE + 0x100))
 #define NVIC_ICPR   ((volatile uint32_t*)(NVIC_BASE + 0x180))
 #define NVIC_IABR   ((volatile uint32_t*)(NVIC_BASE + 0x200))
-#define NVIC_IPR    ((volatile uint32_t*)(NVIC_BASE + 0x100))
+#define NVIC_IPR    ((volatile uint8_t*)(NVIC_BASE + 0x300))
 #define NVIC_STIR   ((volatile uint32_t*)(NVIC_BASE + 0XE00))
 #endif
