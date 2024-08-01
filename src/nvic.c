@@ -7,3 +7,8 @@ void _enable_irq(){
 void _disable_irq(){
     __asm__("CPSID i");
 }
+
+void NVIC_enable_IRQ(IRQn_Type IRQn, uint8_t priority){
+    NVIC_ISER[IRQn >> 5] |= 1 << (IRQn & 31UL);
+    NVIC_IPR[IRQn] = (uint8_t)((priority & 0xF) << 4);
+}
