@@ -49,7 +49,6 @@ void EXTI0_IRQHandler()
     GPIO_write_pin(GPIOB_BASE, 1, 0);
     EXTI_CLEAR_PENDING(0);
     NVIC_CLEAR_PENDING(EXTI0_IRQn);
-    //NVIC_ICPR[6>>5] = 1 << (6 & 31);
 }
 
 void EXTI15_10_IRQHandler()
@@ -59,5 +58,4 @@ void EXTI15_10_IRQHandler()
     GPIO_write_pin(GPIOA_BASE, 12, 0);
     EXTI_CLEAR_PENDING(15);
     NVIC_CLEAR_PENDING(EXTI15_10_IRQn);
-    //NVIC_ICPR[1] = 1 << 8;
 }
