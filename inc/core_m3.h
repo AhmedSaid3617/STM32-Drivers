@@ -48,15 +48,4 @@ typedef struct
 #define TPI ((TPI_Type *)TPI_BASE)                   /*!< TPI configuration struct */
 #define CoreDebug ((CoreDebug_Type *)CoreDebug_BASE) /*!< Core Debug configuration struct */
 
-/* #define CORE_PERIPH_BASE 0xE0000000
-#define NVIC_BASE (CORE_PERIPH_BASE + 0xE100)
-
-#define NVIC_ISER   ((volatile uint32_t*)(NVIC_BASE + 0x00))
-#define NVIC_ICER   ((volatile uint32_t*)(NVIC_BASE + 0x80))
-#define NVIC_ISPR   ((volatile uint32_t*)(NVIC_BASE + 0x100))
-#define NVIC_ICPR   ((volatile uint32_t*)(NVIC_BASE + 0x180))
-#define NVIC_IABR   ((volatile uint32_t*)(NVIC_BASE + 0x200))
-#define NVIC_IPR    ((volatile uint8_t*)(NVIC_BASE + 0x300))
-#define NVIC_STIR   ((volatile uint32_t*)(NVIC_BASE + 0XE00)) */
-
 #endif
