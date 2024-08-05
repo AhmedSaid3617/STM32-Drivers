@@ -8,5 +8,6 @@
 /* Functions */
 
 void SysTick_delay_ms(int ms);
+void SysTick_interrupt_init(int ms);
 
 #endif

@@ -4,20 +4,28 @@
  * @brief Busy wait for ms milliseconds.
  * @param ms Time to wait in milliseconds.
  */
-void SysTick_delay_ms(int ms){
+void SysTick_delay_ms(int ms)
+{
 
     int cycles = 0;
     RESETBIT(SysTick->CTRL, 0);
-    SysTick->LOAD = SYSTEM_CLOCK/1000;
+    SysTick->LOAD = SYSTEM_CLOCK / 1000 - 1;
     SETBIT(SysTick->CTRL, 0);
 
     while (cycles < ms)
     {
-        if (SysTick->CTRL & 1<<16) // If COUNTFLAG
+        if (SysTick->CTRL & 1 << 16) // If COUNTFLAG
         {
             cycles += 1;
         }
-        
     }
+}
+
+void SysTick_interrupt_init(int ms)
+{
+    NVIC_enable_IRQ(SysTick_IRQn, 1);
+    SysTick->LOAD = (SYSTEM_CLOCK/1000) * ms - 1;
+    SETBIT(SysTick->CTRL, 1);
+    SETBIT(SysTick->CTRL, 0);
     
 }
