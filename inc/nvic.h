@@ -7,7 +7,7 @@
 // Function-like macros
 
 // Clear the pending interrupt request (IRQn).
-#define NVIC_CLEAR_PENDING(IRQn) NVIC_ICPR[IRQn >> 5] = 1 << (IRQn & 32UL)
+#define NVIC_CLEAR_PENDING(IRQn) NVIC->ICPR[IRQn >> 5] = 1 << (IRQn & 32UL)
 
 void _enable_irq();
 void _disable_irq();
