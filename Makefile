@@ -1,17 +1,20 @@
 SRC_DIR = src
+DRIVERS_SRC = drivers/src
 OBJS_DIR = build
 INC_DIR = inc
+DRIVERS_INC = drivers/inc
 
 vpath %.c $(SRC_DIR)
+vpath %.c $(DRIVERS_SRC)
 vpath %.o $(OBJS_DIR)
 
 PROJECT_NAME = stm32_blink
 CC = arm-none-eabi-
 CFLAGS = -mcpu=cortex-m3 -g -O0
-INCS = -I $(INC_DIR)
+INCS = -I $(INC_DIR) -I $(DRIVERS_INC)
 LIBS = 
-SRC := $(wildcard *.c) $(wildcard $(SRC_DIR)/*.c)
-OBJ := $(addprefix $(OBJS_DIR)/, $(notdir $(SRC:.c=.o))) 
+SRC := $(wildcard *.c) $(wildcard $(SRC_DIR)/*.c) $(wildcard $(DRIVERS_SRC)/*.c)
+OBJ := $(addprefix $(OBJS_DIR)/, $(notdir $(SRC:.c=.o)))
 AS = $(wildcard *.s)
 AsOBJ = $(addprefix $(OBJS_DIR)/, $(notdir $(AS:.s=.o)))
 
