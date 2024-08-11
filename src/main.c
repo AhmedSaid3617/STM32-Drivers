@@ -1,31 +1,25 @@
-#include "gpio.h"
 #include "rcc.h"
-#include "keypad.h"
+#include "uart.h"
+#include "systick.h"
+#include "gpio.h"
+
 
 int main()
 {
-    RCC_PORTA_ENABLE();
-    RCC_PORTB_ENABLE();
+    RCC_USART2_ENABLE();
 
-    // PB1 OUT
-    GPIO_Init(GPIOB, 1, GPIO_MODE_OUTPUT_PP, GPIO_PULL_FLOATING);
+    USART2->CR1 |= (1<<13);
+    USART2->BRR |= 52 << 4;
+    USART2->BRR |= 1;
+    USART2->CR1 |= (1<<3);
 
-    // PA12 out
-    GPIO_Init(GPIOA, 12, GPIO_MODE_OUTPUT_PP, GPIO_PULL_FLOATING);
-
-    Keypad_init();
+    // PA2 TX
 
     while (1)
     {
-        Keypad_key input_key = Keypad_read();
-        if (input_key == KEYPAD_KEY_NONE)
-        {
-            GPIO_write_pin(GPIOB, 1, 1);
-        }
-        if (input_key == KEYPAD_KEY_LEFT)
-        {
-            GPIO_write_pin(GPIOA, 12, 1);
-        }
+        USART2->DR = 'A';
+        SysTick_delay_ms(500);
+        
     }
 
     return 0;
