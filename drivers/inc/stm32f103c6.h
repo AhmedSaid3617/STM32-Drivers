@@ -5,7 +5,7 @@
 
 /* System parameters */
 
-#define SYSTEM_CLOCK 1000000
+#define SYSTEM_CLOCK 8000000
 
 #define FLASH_BASE 0x08000000UL      /*!< FLASH base address in the alias region */
 #define FLASH_BANK1_END 0x08007FFFUL /*!< FLASH END address of bank1 */

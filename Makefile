@@ -10,7 +10,7 @@ vpath %.o $(OBJS_DIR)
 
 PROJECT_NAME = stm32_blink
 CC = arm-none-eabi-
-CFLAGS = -mcpu=cortex-m3 -g -O0
+CFLAGS = -mcpu=cortex-m3 -g -O0 -ffreestanding -mthumb -mfloat-abi=soft
 INCS = -I $(INC_DIR) -I $(DRIVERS_INC)
 LIBS = 
 SRC := $(wildcard *.c) $(wildcard $(SRC_DIR)/*.c) $(wildcard $(DRIVERS_SRC)/*.c)
@@ -32,7 +32,7 @@ $(OBJS_DIR)/%.o: %.s
 	$(CC)as $< -o $@ 
 
 $(PROJECT_NAME).elf: $(OBJ) $(AsOBJ)
-	$(CC)ld -T STM32F103C6TX_FLASH.ld $(AsOBJ) $(OBJ) -o $@ -Map="map_file.map"
+	$(CC)gcc -T STM32F103C6TX_FLASH.ld $(AsOBJ) $(OBJ) -o $@ -mcpu=cortex-m3 -mthumb
 
 $(PROJECT_NAME).bin: $(PROJECT_NAME).elf
 	$(CC)objcopy -O binary $< $@
