@@ -13,8 +13,8 @@ typedef enum {
 
 typedef enum {
     UART_STATUS_SUCCESS,
-    UART_STATUS_TX_EMPTY,
-    UART_STATUS_RX_FULL,
+    UART_STATUS_TX_FULL,
+    UART_STATUS_RX_EMPTY,
 } UART_status;
 
 /**
@@ -29,5 +29,6 @@ typedef struct
 
 void UART_Init(UART_Init_t* init_handle);
 UART_status UART_receive_byte(USART_TypeDef* uart_base, uint8_t* dest);
+UART_status UART_send_byte(USART_TypeDef* uart_base, uint8_t byte);
 
 #endif

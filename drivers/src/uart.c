@@ -31,3 +31,35 @@ void UART_Init(UART_Init_t *init_handle)
         break;
     }
 }
+
+/**
+ * @brief Receive one byte from a USART module.
+ * @param uart_base Base address for the USART module.
+ * @param dest Pointer to the variable in which to store the received byte.
+ * @return Returns a status, either UART_STATUS_SUCCESS if recieved successfully, or UART_STATUS_RX_EMPTY if there's nothing to receive.
+ */
+UART_status UART_receive_byte(USART_TypeDef *uart_base, uint8_t *dest)
+{
+    if (uart_base->SR & (1 << 5)) // If RX not empty.
+    {
+        *dest = uart_base->DR & 0xFF;
+        return UART_STATUS_SUCCESS;
+    }
+    return UART_STATUS_RX_EMPTY;
+}
+
+/**
+ * @brief Send one byte over a USART module.
+ * @param uart_base Base address for the USART module.
+ * @param dest The required byte to send.
+ * @return Returns a status, either UART_STATUS_SUCCESS if recieved successfully, or UART_STATUS_TX_FULL if some other value is being transmitted.
+ */
+UART_status UART_send_byte(USART_TypeDef *uart_base, uint8_t byte)
+{
+    if (uart_base->SR & (1 << 7))
+    { // If TX empty.
+        uart_base->DR = byte;
+        return UART_STATUS_SUCCESS;
+    }
+    return UART_STATUS_TX_FULL;
+}

@@ -7,6 +7,7 @@ UART_Init_t init_handle;
 
 int main()
 {
+    uint8_t rec_char = 0;
     RCC_USART2_ENABLE();
     RCC_PORTA_ENABLE();
 
@@ -28,15 +29,15 @@ int main()
 
     while (1)
     {
-        if (USART2->SR & (1 << 5))
+        if (UART_receive_byte(USART2, &rec_char) == UART_STATUS_SUCCESS)
         {
-            if (USART2->DR == 'A')
+            if (rec_char == 'B')
             {
                 GPIO_write_pin(GPIOA, 8, 1);
                 SysTick_delay_ms(3000);
                 GPIO_write_pin(GPIOA, 8, 0);
-                USART2->DR = 'H';
-            }
+                UART_send_byte(USART2, 'H');
+            }   
         }
     }
 
