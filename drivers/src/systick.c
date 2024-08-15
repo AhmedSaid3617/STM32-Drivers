@@ -9,7 +9,7 @@ void SysTick_delay_ms(int ms)
 
     int cycles = 0;
     RESETBIT(SysTick->CTRL, 0);
-    SysTick->LOAD = SYSTEM_CLOCK / 1000 - 1;
+    SysTick->LOAD = SYSTICK_CLK / 1000 - 1;
     SETBIT(SysTick->CTRL, 0);
 
     while (cycles < ms)
@@ -24,7 +24,7 @@ void SysTick_delay_ms(int ms)
 void SysTick_interrupt_init(int ms)
 {
     NVIC_enable_IRQ(SysTick_IRQn, 1);
-    SysTick->LOAD = (SYSTEM_CLOCK/1000) * ms - 1;
+    SysTick->LOAD = (SYSTICK_CLK/1000) * ms - 1;
     SETBIT(SysTick->CTRL, 1);
     SETBIT(SysTick->CTRL, 0);
     

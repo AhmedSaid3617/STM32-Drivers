@@ -9,15 +9,25 @@ typedef enum {
     UART_MODE_TX,
     UART_MODE_RX,
     UART_MODE_FULL_DUPLEX
-} UART_Mode;
+} UART_mode;
 
+typedef enum {
+    UART_STATUS_SUCCESS,
+    UART_STATUS_TX_EMPTY,
+    UART_STATUS_RX_FULL,
+} UART_status;
+
+/**
+ * @brief This struct contains the initialization parameters for UART module.
+ */
 typedef struct
 {
     USART_TypeDef* USART_base;
     uint32_t baud_rate;
-    UART_Mode tx_mode;
+    UART_mode mode;
 } UART_Init_t;
 
 void UART_Init(UART_Init_t* init_handle);
+UART_status UART_receive_byte(USART_TypeDef* uart_base, uint8_t* dest);
 
 #endif

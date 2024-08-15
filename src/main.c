@@ -9,10 +9,6 @@ int main()
 {
     RCC_USART2_ENABLE();
     RCC_PORTA_ENABLE();
-    RCC_PORTC_ENABLE();
-
-    // PC13 OUT
-    GPIO_Init(GPIOC, 13, GPIO_MODE_OUTPUT_PP, GPIO_PULL_FLOATING);
 
     // PA8 OUT
     GPIO_Init(GPIOA, 8, GPIO_MODE_OUTPUT_PP, GPIO_PULL_FLOATING);
@@ -24,14 +20,11 @@ int main()
     // PA3 (RX) GPIO Input floating
     GPIO_Init(GPIOA, 3, GPIO_MODE_INPUT, GPIO_PULL_FLOATING);
 
-    init_handle.baud_rate = 19200;
+    // Initialize USART2
+    init_handle.baud_rate = 9600;
     init_handle.USART_base = USART2_BASE;
-
-    // USART2->CR1 |= (1 << 13);   // Enable UART
-    /* USART2->BRR |= 52 << 4;     // Configure baud rate.
-    USART2->BRR |= 1; */
+    init_handle.mode = UART_MODE_FULL_DUPLEX;
     UART_Init(&init_handle);
-    USART2->CR1 |= (1 << 2); // Enable RX
 
     while (1)
     {
@@ -40,8 +33,9 @@ int main()
             if (USART2->DR == 'A')
             {
                 GPIO_write_pin(GPIOA, 8, 1);
-                SysTick_delay_ms(100);
+                SysTick_delay_ms(3000);
                 GPIO_write_pin(GPIOA, 8, 0);
+                USART2->DR = 'H';
             }
         }
     }
@@ -51,6 +45,8 @@ int main()
 
 void HardFault_Handler()
 {
+    RCC_PORTC_ENABLE();
+    GPIO_Init(GPIOC, 13, GPIO_MODE_OUTPUT_PP, GPIO_PULL_FLOATING);
     while (1)
     {
         GPIO_write_pin(GPIOC, 13, 1);

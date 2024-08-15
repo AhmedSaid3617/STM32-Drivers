@@ -33,6 +33,7 @@ typedef enum {
     GPIO_SPEED_50MHZ
 } GPIO_SPEED;
 
+// FIXME: fix all caps.
 void GPIO_Init(GPIO_TypeDef* GPIO_BASE, int pin, GPIO_MODE mode, GPIO_PULL pull);
 uint32_t GPIO_read_pin(GPIO_TypeDef* gpio_base, uint8_t pin);
 void GPIO_write_pin(GPIO_TypeDef* gpio_base, uint8_t pin, uint8_t value);

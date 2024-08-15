@@ -2,10 +2,7 @@
 #define STM32F103C6
 
 #include <stdint.h>
-
-/* System parameters */
-
-#define SYSTEM_CLOCK 8000000
+#include "clocks.h"
 
 #define FLASH_BASE 0x08000000UL      /*!< FLASH base address in the alias region */
 #define FLASH_BANK1_END 0x08007FFFUL /*!< FLASH END address of bank1 */
