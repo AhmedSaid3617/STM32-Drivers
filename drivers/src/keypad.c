@@ -1,20 +1,29 @@
 #include "keypad.h"
+// TODO: Test the new gpio init function with keypad module.
 
 /**
  * @brief Initialize keypad. GPIO port is defined in header file. Column pins must be connected to pins 0-4 of the GPIO port.
  */
 void Keypad_init()
 {
+    GPIO_Init_t gpio_init_handle;
+
     // Port A0-4 input pulled down.
+    gpio_init_handle.gpio_base = GPIOA;
+    gpio_init_handle.mode = GPIO_MODE_INPUT_PULL_DOWN;
     for (int i = 0; i <= 4; i++)
     {
-        GPIO_Init(ROW_PORT, i, GPIO_MODE_INPUT, GPIO_PULL_DOWN);
+        gpio_init_handle.pin = i;
+        GPIO_init(&gpio_init_handle);
     }
 
     // Port A5-8 output pp.
+    gpio_init_handle.mode = GPIO_MODE_OUTPUT_PP;
+    gpio_init_handle.speed = GPIO_SPEED_10MHZ;
     for (int i = 5; i <= 8; i++)
     {
-        GPIO_Init(COLUMN_PORT, i, GPIO_MODE_OUTPUT_PP, GPIO_PULL_FLOATING);
+        gpio_init_handle.pin = i;
+        GPIO_init(&gpio_init_handle);
     }
 }
 

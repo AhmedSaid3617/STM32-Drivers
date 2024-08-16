@@ -10,11 +10,16 @@
 #define RCC_APB1ENR     *((volatile uint32_t*)(RCC_BASE+0x1C))
 
 // Function-like macros.
+
 #define RCC_PORTA_ENABLE()  RCC_APB2ENR |= (1<<2)
 #define RCC_PORTB_ENABLE()  RCC_APB2ENR |= (1<<3)
 #define RCC_PORTC_ENABLE()  RCC_APB2ENR |= (1<<4)
+
 #define RCC_AFIO_ENABLE()   RCC_APB2ENR |= (1<<0)
+
+#define RCC_USART1_ENABLE() RCC_APB2ENR |= (1<<14)
 #define RCC_USART2_ENABLE() RCC_APB1ENR |= (1<<17)
+#define RCC_USART3_ENABLE() RCC_APB1ENR |= (1<<18)
 
 
 #endif

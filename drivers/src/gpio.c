@@ -1,56 +1,62 @@
 #include "gpio.h"
 
 /**
- * @brief Initialize a GPIO pin to the specified mode.
- * @param gpio_base Address to the base of the GPIO port.
- * @param pin Pin number to be initialized.
- * @param mode In/Out, Pull Push/Open Drain.
- * @param pull Input pin pull-down/pull-up/floating.
+ * @brief Initialize a GPIO pin.
+ * 
+ * @param init_handle Parameters for initialization.
  */
-void GPIO_Init(GPIO_TypeDef* gpio_base, int pin, GPIO_MODE mode, GPIO_PULL pull){
-    uint8_t control_data = 0;
-    uint16_t odr_r = 0;
-    switch (mode)
+void GPIO_init(GPIO_Init_t* init_handle){
+    uint8_t control = 0;
+    uint32_t odr_r = 0;
+    if (init_handle->mode > GPIO_MODE_INPUT_PULL_DOWN)  // If mode is output.
     {
-    case GPIO_MODE_ANALOG:
-        control_data = 0;
+        // FIXME: Set a default speed.
+        control |= init_handle->speed;                  // Then set the speed.
+    }
+
+    switch (init_handle->mode)
+    {
+    case GPIO_MODE_INPUT_FLOATING:
+        control |= 0b0100;
         break;
     
-    case GPIO_MODE_INPUT:
-        if (pull == GPIO_PULL_DOWN)
-        {
-            control_data = 0b1000ul;
-            odr_r = gpio_base->ODR & ~(1<<pin);     // Set odr_r to the ODR with this bit reset.
-        }
-        else if (pull == GPIO_PULL_UP)
-        {
-            control_data = 0b1000ul;
-            odr_r = gpio_base->ODR | (1<<pin);     // Set odr_r to the ODR with this bit set.
-        }
-        else{
-            control_data = 0b0100ul;
-        }
+    case GPIO_MODE_INPUT_PULL_UP:
+        control |= 0b1000;
+        odr_r = init_handle->gpio_base->ODR | (1<<init_handle->pin);
+        break;
+    
+    case GPIO_MODE_INPUT_PULL_DOWN:
+        control |= 0b1000;
+        odr_r = init_handle->gpio_base->ODR & ~(1<<init_handle->pin);
+        break;
+    
+    case GPIO_MODE_OUTPUT_OD:
+        control |= 0b0100;
         break;
 
-    case GPIO_MODE_OUTPUT_OD:
-        control_data = 0b0101;
+    case GPIO_MODE_AFIO_PP:
+        control |= 0b1000;
+        break;
+    
+    case GPIO_MODE_AFIO_OD:
+        control |= 0b1100;
+        break;
 
-    case GPIO_MODE_OUTPUT_PP:
-        control_data = 0b0001;
     default:
         break;
     }
-
-    if (pin < 8)
+    
+    if (init_handle->pin < 8)
     {
-        gpio_base->CRL &= ~(0xF << (pin*4));
-        gpio_base->CRL |= (control_data << (pin * 4));
+        init_handle->gpio_base->CRL &= ~(0xF << (init_handle->pin*4));
+        init_handle->gpio_base->CRL |= (control << (init_handle->pin * 4));
     }
     else {
-        gpio_base->CRH &= ~(0xF << ((pin-8) * 4));
-        gpio_base->CRH |= (control_data << ((pin - 8) * 4));
+        init_handle->gpio_base->CRH &= ~(0xF << ((init_handle->pin-8) * 4));
+        init_handle->gpio_base->CRH |= (control << ((init_handle->pin - 8) * 4));
     }
-    gpio_base->ODR = odr_r;
+    init_handle->gpio_base->ODR = odr_r;
+
 }
 
 /**

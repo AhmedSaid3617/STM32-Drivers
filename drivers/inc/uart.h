@@ -3,7 +3,9 @@
 
 #include "stm32f103c6.h"
 
+#define USART1 ((USART_TypeDef*)(USART1_BASE))
 #define USART2 ((USART_TypeDef*)(USART2_BASE))
+#define USART3 ((USART_TypeDef*)(USART3_BASE))
 
 typedef enum {
     UART_MODE_TX,
@@ -18,7 +20,7 @@ typedef enum {
 } UART_status;
 
 /**
- * @brief This struct contains the initialization parameters for UART module.
+ * @brief Initialization parameters for UART module.
  */
 typedef struct
 {
