@@ -10,8 +10,13 @@ void GPIO_init(GPIO_Init_t* init_handle){
     uint32_t odr_r = 0;
     if (init_handle->mode > GPIO_MODE_INPUT_PULL_DOWN)  // If mode is output.
     {
-        // FIXME: Set a default speed.
         control |= init_handle->speed;                  // Then set the speed.
+        // If  speed wasn't set by user, then set it to 10MHZ.
+        if (init_handle->speed == 0)
+        {
+            control |= GPIO_SPEED_10MHZ;
+        }
+        
     }
 
     switch (init_handle->mode)
