@@ -14,7 +14,8 @@ typedef enum {
 
 typedef enum {
     I2C_STATUS_SUCCESS,
-    I2C_STATUS_HARDWARE_ERR
+    I2C_STATUS_ERR,
+    I2C_STATUS_NACK
 } I2C_status;
 
 typedef struct

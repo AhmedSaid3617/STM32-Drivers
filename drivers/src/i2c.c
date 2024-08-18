@@ -10,8 +10,10 @@ void I2C_init(I2C_TypeDef *I2C_base)
 
 I2C_status I2C_master_send(I2C_TypeDef *I2C_base, uint8_t slave_address, uint8_t *data_ptr, uint32_t data_size)
 {
-    I2C1->CR1 |= (1 << 8); // Send start condition.
-    for (volatile uint32_t i = 0; i <= 10000; i++)  // Wait while start bit not set.
+    // TODO: See why NACK happens if you send a zero.
+
+    I2C1->CR1 |= (1 << 8);                         // Send start condition.
+    for (volatile uint32_t i = 0; i <= 10000; i++) // Wait while start bit not set.
     {
         if (I2C1->SR1 & (1 << 0))
         {
@@ -19,22 +21,30 @@ I2C_status I2C_master_send(I2C_TypeDef *I2C_base, uint8_t slave_address, uint8_t
         }
         else if (i == 10000)
         {
-            return I2C_STATUS_HARDWARE_ERR;         // After timeout, return error.
+            return I2C_STATUS_ERR; // After timeout, return error.
         }
-                 
     }
 
-    I2C1->DR = (slave_address << 1);  // Send slave address with Write bit.
+    I2C1->DR = (slave_address << 1); // Send slave address with Write bit.
 
-    while (!(I2C1->SR1 & 1 << 1)); // Wait while address not sent.
+    while (!(I2C1->SR1 & 1 << 1))   // Wait while address not sent.
+    {                            
+        if (I2C1->SR1 & 1 << 10) // In case of NACK condition.
+        {
+            return I2C_STATUS_NACK;
+        }
+    }
 
-    // TODO: Check this error, sends -1 if this line is removed.
     if (I2C1->SR2); // Read SR2 to clear ADDR bit
 
-    for (volatile uint8_t * i = data_ptr; i < data_ptr + data_size; i++)
+    for (volatile uint8_t *i = data_ptr; i < data_ptr + data_size; i++)
     {
-        while (!(I2C1->SR1 & (1 << 7))); // Wait while TX not empty.
-        I2C1->DR = *i;  // Write byte to data register.
+        while (!(I2C1->SR1 & (1 << 7)));  // Wait while TX not empty.
+        I2C1->DR = *i; // Write byte to data register.
+        /* if (I2C1->SR1 & 1 << 10) // In case of NACK condition.
+        {
+            return I2C_STATUS_NACK;
+        } */
     }
 
     // Send stop transmission.

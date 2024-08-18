@@ -29,12 +29,12 @@ int main()
     while (1)
     {
 
-        if (I2C_master_send(I2C1, 8, arr, 12) == I2C_STATUS_HARDWARE_ERR)
+        if (I2C_master_send(I2C1, 8, arr, 20) == I2C_STATUS_NACK)
         {
             HardFault_Handler();
         }
 
-        SysTick_delay_ms(2000);
+        SysTick_delay_ms(200);
     }
 
     return 0;
