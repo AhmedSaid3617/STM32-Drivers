@@ -157,4 +157,17 @@ typedef struct
     volatile uint32_t GTPR; /*!< USART Guard time and prescaler register, Address offset: 0x18 */
 } USART_TypeDef;
 
+typedef struct
+{
+    volatile uint32_t CR1;
+    volatile uint32_t CR2;
+    volatile uint32_t OAR1;
+    volatile uint32_t OAR2;
+    volatile uint32_t DR;
+    volatile uint32_t SR1;
+    volatile uint32_t SR2;
+    volatile uint32_t CCR;
+    volatile uint32_t TRISE;
+} I2C_TypeDef;
+
 #endif

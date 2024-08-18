@@ -5,9 +5,11 @@
 #define SYSTICK_CLK (SYSCLK/8)
 
 #define APB1_DIV 1
-#define APB1_CLK (SYSCLK/APB1_DIV)
+#define PCLK1 (SYSCLK/APB1_DIV)
+#define TPCLK1 125
 
 #define APB2_DIV 1
-#define APB2_CLK (SYSCLK/APB2_DIV)
+#define PCLK2 (SYSCLK/APB2_DIV)
+#define TPCLK2 125
 
 #endif

@@ -21,5 +21,6 @@
 #define RCC_USART2_ENABLE() RCC_APB1ENR |= (1<<17)
 #define RCC_USART3_ENABLE() RCC_APB1ENR |= (1<<18)
 
+#define RCC_I2C1_ENABLE()   RCC_APB1ENR |= (1<<21)
 
 #endif
