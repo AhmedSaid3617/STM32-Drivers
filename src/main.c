@@ -5,9 +5,9 @@
 
 GPIO_Init_t gpio_init_handle;
 
-char arr[12] = "Hello world";
+uint8_t received[7] = {};
 
-void HardFault_Handler();
+void blink_led();
 
 int main()
 {
@@ -24,23 +24,36 @@ int main()
     gpio_init_handle.pin = 7;
     GPIO_init(&gpio_init_handle);
 
+    // PB12 OUT PP
+    gpio_init_handle.pin = 12;
+    gpio_init_handle.mode = GPIO_MODE_OUTPUT_PP;
+    GPIO_init(&gpio_init_handle);
+
     I2C_init(I2C1);
 
     while (1)
     {
+        SysTick_delay_ms(1000);
 
-        if (I2C_master_send(I2C1, 8, arr, 20) == I2C_STATUS_NACK)
+        if (I2C_master_receive(I2C1, 8, &received, 1) == I2C_STATUS_ERR)
         {
-            HardFault_Handler();
+            blink_led();
         }
 
-        SysTick_delay_ms(200);
+        if (received[0] == 'A')
+        {
+            received[0] = 'X';
+            GPIO_write_pin(GPIOB, 12, 1);
+            SysTick_delay_ms(500);
+            GPIO_write_pin(GPIOB, 12, 0);
+        }
+
     }
 
     return 0;
 }
 
-void HardFault_Handler()
+void blink_led()
 {
     RCC_PORTC_ENABLE();
     GPIO_Init_t gpio_init_handle;
