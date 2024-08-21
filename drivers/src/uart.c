@@ -68,6 +68,14 @@ UART_status UART_send_byte(USART_TypeDef *uart_base, uint8_t byte)
     return UART_STATUS_TX_FULL;
 }
 
+// TODO: insert comment.
+/**
+ * @brief 
+ * 
+ * @param uart_base 
+ * @param data 
+ * @return UART_status 
+ */
 UART_status UART_printf(USART_TypeDef *uart_base, uint8_t *data)
 {
     while (*data != 0)

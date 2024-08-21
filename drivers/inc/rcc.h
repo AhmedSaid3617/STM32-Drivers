@@ -24,4 +24,7 @@
 #define RCC_I2C1_ENABLE()   RCC_APB1ENR |= (1<<21)
 #define RCC_I2C2_ENABLE()   RCC_APB1ENR |= (1<<22)
 
+#define RCC_ADC1_ENABLE()   RCC_APB2ENR |= (1<<9)
+#define RCC_ADC2_ENABLE()   RCC_APB2ENR |= (1<<10)
+
 #endif
