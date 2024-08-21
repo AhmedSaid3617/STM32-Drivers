@@ -36,7 +36,7 @@ int main()
     gpio_init_handle.speed = GPIO_SPEED_10MHZ;
     GPIO_init(&gpio_init_handle);
 
-    /* ADC1->CR2 |= 1 << 0; // Start ADC (ADON = 1)
+    ADC1->CR2 |= 1 << 0; // Start ADC (ADON = 1)
 
     for (int i = 0; i < 100; i++)
     {
@@ -51,20 +51,20 @@ int main()
     }
 
     // Choose channel 1 to be sampled.
-    ADC1->SQR3 |= 1; */
+    //ADC1->SQR3 |= 1;
 
     while (1)
     {
-        /* ADC1->CR2 |= 1 << 0; // Start ADC (ADON = 1)
+        ADC1->CR2 |= 1 << 0; // Start ADC (ADON = 1)
 
         while (!(ADC1->SR & 1<<1))  // Wait until EOC
         {
 
         }
 
-        voltage = (ADC1->DR/4096)*3.3f;
-        */
-        sprintf_(string, "Voltage: %.2f\n", 1.5f);
+        voltage = (ADC1->DR/4096.0)*3.3f;
+       
+        sprintf_(string, "Voltage: %.2f\n", voltage);
         UART_printf(USART3, string);
         SysTick_delay_ms(1000);
     }
