@@ -2,16 +2,52 @@
 
 /**
  * @brief Initialize I2C module.
- * @attention Make sure to call I2C_pins_cfg() in order to configure I2C pins.
  *
  * @param I2C_base Base address for I2C module.
  */
 void I2C_init(I2C_TypeDef *I2C_base)
 {
+    I2C_pins_cfg((uint32_t)I2C_base);
     I2C_base->CR2 |= PCLK1;               // Set system FREQ = 8MHz
     I2C_base->CCR |= 5000 / TPCLK1;       // Set I2C frequency = 100 KHz
     I2C_base->TRISE |= 1000 / TPCLK1 + 1; // Set min TRISE = 1000 ns
     I2C_base->CR1 |= (1 << 0);            // Enable I2C
+}
+
+void I2C_pins_cfg(uint32_t I2C_base)
+{
+    GPIO_Init_t gpio_init_handle;
+    RCC_PORTB_ENABLE();
+
+    switch (I2C_base)
+    {
+    case I2C1_BASE:
+        // PB6 (SCL1), PB7 (SDA1) AFIO open drain.
+        gpio_init_handle.gpio_base = GPIOB;
+        gpio_init_handle.mode = GPIO_MODE_AFIO_OD;
+        gpio_init_handle.speed = GPIO_SPEED_10MHZ;
+        gpio_init_handle.pin = 6;
+        GPIO_init(&gpio_init_handle);
+
+        gpio_init_handle.pin = 7;
+        GPIO_init(&gpio_init_handle);
+        break;
+
+    case I2C2_BASE:
+        // PB10 (SCL2), PB11 (SDA2) AFIO open drain.
+        gpio_init_handle.gpio_base = GPIOB;
+        gpio_init_handle.mode = GPIO_MODE_AFIO_OD;
+        gpio_init_handle.speed = GPIO_SPEED_10MHZ;
+        gpio_init_handle.pin = 10;
+        GPIO_init(&gpio_init_handle);
+
+        gpio_init_handle.pin = 11;
+        GPIO_init(&gpio_init_handle);
+        break;
+
+    default:
+        break;
+    }
 }
 
 /**
@@ -105,8 +141,8 @@ I2C_status I2C_master_receive(I2C_TypeDef *I2C_base, uint8_t slave_address, uint
         }
     }
 
-    if (I2C1->SR2)  // Read SR2 to clear ADDR bit
-        ; 
+    if (I2C1->SR2) // Read SR2 to clear ADDR bit
+        ;
 
     // In case of sending 1 byte.
 
