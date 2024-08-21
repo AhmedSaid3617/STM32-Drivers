@@ -56,10 +56,24 @@ UART_status UART_receive_byte(USART_TypeDef *uart_base, uint8_t *dest)
  */
 UART_status UART_send_byte(USART_TypeDef *uart_base, uint8_t byte)
 {
-    if (uart_base->SR & (1 << 7))
-    { // If TX empty.
-        uart_base->DR = byte;
-        return UART_STATUS_SUCCESS;
+    for (int i = 0; i < 1000; i++)
+    {
+        if (uart_base->SR & (1 << 7))
+        {
+            uart_base->DR = byte;
+            return UART_STATUS_SUCCESS;
+        }
     }
+
     return UART_STATUS_TX_FULL;
+}
+
+UART_status UART_printf(USART_TypeDef *uart_base, uint8_t *data)
+{
+    while (*data != 0)
+    {
+        UART_send_byte(uart_base, *(data++));
+    }
+
+    return UART_STATUS_SUCCESS;
 }
