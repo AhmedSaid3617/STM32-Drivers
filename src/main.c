@@ -4,6 +4,7 @@
 #include "uart.h"
 #include "adc.h"
 #include "printf.h"
+#include "nvic.h"
 
 float voltage;
 GPIO_Init_t gpio_init_handle;
@@ -17,6 +18,8 @@ int main()
     RCC_PORTB_ENABLE();
     RCC_USART3_ENABLE();
 
+    _enable_irq();
+
     // PB10 (TX) AFIO Pull Push
     gpio_init_handle.gpio_base = GPIOB;
     gpio_init_handle.mode = GPIO_MODE_AFIO_PP;
@@ -26,7 +29,7 @@ int main()
     // Initialize USART3
     uart_init_handle.baud_rate = 9600;
     uart_init_handle.USART_base = USART3;
-    uart_init_handle.mode = UART_MODE_FULL_DUPLEX;
+    uart_init_handle.mode = UART_MODE_TX;
     UART_Init(&uart_init_handle);
 
     // PA0 input analog.
@@ -35,6 +38,10 @@ int main()
     gpio_init_handle.pin = 0;
     gpio_init_handle.speed = GPIO_SPEED_10MHZ;
     GPIO_init(&gpio_init_handle);
+
+    // ADC interrupt.
+    // ADC1->CR1 |= 1 << 5;             // Enable interrupts for EOC.
+    // NVIC_enable_IRQ(ADC1_2_IRQn, 2); // Enable interrupts globally for ADC1 and 2 with priority 2.
 
     ADC1->CR2 |= 1 << 0; // Start ADC (ADON = 1)
 
@@ -48,23 +55,20 @@ int main()
     for (int i = 0; i < 100; i++)
     {
         // Wait for some time.
+        // TODO: figure out this time.
     }
 
     // Choose channel 1 to be sampled.
-    //ADC1->SQR3 |= 1;
+    // ADC1->SQR3 |= 1;
+
+    ADC1->CR2 |= 1 << 1; // Set CONT bit for continuous conversion.
+    ADC1->CR2 |= 1 << 0; // Start ADC (ADON = 1).
 
     while (1)
     {
-        ADC1->CR2 |= 1 << 0; // Start ADC (ADON = 1)
+        voltage = (ADC1->DR / 4096.0) * 3.3f;
 
-        while (!(ADC1->SR & 1<<1))  // Wait until EOC
-        {
-
-        }
-
-        voltage = (ADC1->DR/4096.0)*3.3f;
-       
-        sprintf_(string, "Voltage: %.2f\n", voltage);
+        sprintf_(string, "Voltage: %.4f\n", voltage);
         UART_printf(USART3, string);
         SysTick_delay_ms(1000);
     }
@@ -89,6 +93,17 @@ void HardFault_Handler()
         SysTick_delay_ms(1000);
     };
 }
+
+/* void ADC1_2_IRQHandler()
+{
+    voltage = (ADC1->DR / 4096.0) * 3.3f;
+
+    sprintf_(string, "Voltage: %.2f\n", voltage);
+    UART_printf(USART3, string);
+    SysTick_delay_ms(1000);
+
+    NVIC_CLEAR_PENDING(ADC1_2_IRQn);
+} */
 
 void _putchar(char character)
 {
