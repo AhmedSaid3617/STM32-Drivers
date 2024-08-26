@@ -32,6 +32,8 @@ void UART_Init(UART_Init_t *init_handle)
     }
 }
 
+// TODO: configure pins function.
+
 /**
  * @brief Receive one byte from a USART module.
  * @param uart_base Base address for the USART module.
