@@ -4,10 +4,12 @@
 #include "uart.h"
 #include "adc.h"
 #include "printf.h"
+#include "nvic.h"
 
 float voltage;
 GPIO_Init_t gpio_init_handle;
 UART_Init_t uart_init_handle;
+ADC_init_typedef adc_init_handle;
 char string[100] = "hello";
 
 int main()
@@ -16,6 +18,8 @@ int main()
     RCC_PORTA_ENABLE();
     RCC_PORTB_ENABLE();
     RCC_USART3_ENABLE();
+
+    _enable_irq();
 
     // PB10 (TX) AFIO Pull Push
     gpio_init_handle.gpio_base = GPIOB;
@@ -29,44 +33,19 @@ int main()
     uart_init_handle.mode = UART_MODE_TX;
     UART_Init(&uart_init_handle);
 
-    // PA0 input analog.
-    gpio_init_handle.gpio_base = GPIOA;
-    gpio_init_handle.mode = GPIO_MODE_INPUT_ANALOG;
-    gpio_init_handle.pin = 0;
-    gpio_init_handle.speed = GPIO_SPEED_10MHZ;
-    GPIO_init(&gpio_init_handle);
-
-    ADC1->CR2 |= 1 << 0; // Start ADC (ADON = 1)
-
-    for (int i = 0; i < 100; i++)
-    {
-        // Wait for 2 ADC cycles.
-    }
-
-    ADC1->CR2 |= 1 << 2; // Calibrate ADC
-
-    for (int i = 0; i < 100; i++)
-    {
-        // Wait for some time.
-    }
-
-    // Choose channel 1 to be sampled.
-    //ADC1->SQR3 |= 1;
+    adc_init_handle.ADC_base = ADC1;
+    adc_init_handle.channel_num = 2;
+    adc_init_handle.mode = ADC_MODE_CONT;
+    ADC_init(&adc_init_handle);
 
     while (1)
     {
-        ADC1->CR2 |= 1 << 0; // Start ADC (ADON = 1)
 
-        while (!(ADC1->SR & 1<<1))  // Wait until EOC
-        {
+        voltage = (ADC_read_single(ADC1) / 4096.0) * 3.3f;
 
-        }
-
-        voltage = (ADC1->DR/4096.0)*3.3f;
-       
-        sprintf_(string, "Voltage: %.2f\n", voltage);
+        sprintf_(string, "Voltage: %.4f\n", voltage);
         UART_printf(USART3, string);
-        SysTick_delay_ms(1000);
+        SysTick_delay_ms(200);
     }
 
     return 0;
