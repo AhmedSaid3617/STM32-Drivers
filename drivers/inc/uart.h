@@ -2,6 +2,7 @@
 #define UART_H
 
 #include "stm32f103c6.h"
+#include "systick.h"
 
 #define USART1 ((USART_TypeDef*)(USART1_BASE))
 #define USART2 ((USART_TypeDef*)(USART2_BASE))
@@ -32,5 +33,6 @@ typedef struct
 void UART_Init(UART_Init_t* init_handle);
 UART_status UART_receive_byte(USART_TypeDef* uart_base, uint8_t* dest);
 UART_status UART_send_byte(USART_TypeDef* uart_base, uint8_t byte);
+UART_status UART_printf(USART_TypeDef *uart_base, uint8_t* data);
 
 #endif

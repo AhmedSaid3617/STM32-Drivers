@@ -7,7 +7,7 @@
         {
             "name": "Cortex Debug",
             "cwd": "${workspaceFolder}",
-            "executable": "stm32_blink.elf",
+            "executable": "stm32_drivers.elf",
             "request": "launch",
             "type": "cortex-debug",
             "runToEntryPoint": "main",

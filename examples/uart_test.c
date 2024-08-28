@@ -3,7 +3,7 @@
 #include "systick.h"
 #include "gpio.h"
 
-UART_Init_t init_handle;
+UART_Init_t uart_init_handle;
 GPIO_Init_t gpio_init_handle;
 
 int main()
@@ -32,10 +32,10 @@ int main()
     GPIO_init(&gpio_init_handle);
 
     // Initialize USART3
-    init_handle.baud_rate = 9600;
-    init_handle.USART_base = USART3;
-    init_handle.mode = UART_MODE_FULL_DUPLEX;
-    UART_Init(&init_handle);
+    uart_init_handle.baud_rate = 9600;
+    uart_init_handle.USART_base = USART3;
+    uart_init_handle.mode = UART_MODE_FULL_DUPLEX;
+    UART_Init(&uart_init_handle);
 
     while (1)
     {

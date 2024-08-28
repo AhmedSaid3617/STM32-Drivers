@@ -171,4 +171,53 @@ typedef struct
     volatile uint32_t TRISE;
 } I2C_TypeDef;
 
+typedef struct
+{
+    volatile uint32_t SR;
+    volatile uint32_t CR1;
+    volatile uint32_t CR2;
+    volatile uint32_t SMPR1;
+    volatile uint32_t SMPR2;
+    volatile uint32_t JOFR1;
+    volatile uint32_t JOFR2;
+    volatile uint32_t JOFR3;
+    volatile uint32_t JOFR4;
+    volatile uint32_t HTR;
+    volatile uint32_t LTR;
+    volatile uint32_t SQR1;
+    volatile uint32_t SQR2;
+    volatile uint32_t SQR3;
+    volatile uint32_t JSQR;
+    volatile uint32_t JDR1;
+    volatile uint32_t JDR2;
+    volatile uint32_t JDR3;
+    volatile uint32_t JDR4;
+    volatile uint32_t DR;
+} ADC_TypeDef;
+
+typedef struct
+{
+    volatile uint32_t CR1;   /*!< TIM control register 1,                      Address offset: 0x00 */
+    volatile uint32_t CR2;   /*!< TIM control register 2,                      Address offset: 0x04 */
+    volatile uint32_t SMCR;  /*!< TIM slave Mode Control register,             Address offset: 0x08 */
+    volatile uint32_t DIER;  /*!< TIM DMA/interrupt enable register,           Address offset: 0x0C */
+    volatile uint32_t SR;    /*!< TIM status register,                         Address offset: 0x10 */
+    volatile uint32_t EGR;   /*!< TIM event generation register,               Address offset: 0x14 */
+    volatile uint32_t CCMR1; /*!< TIM  capture/compare mode register 1,        Address offset: 0x18 */
+    volatile uint32_t CCMR2; /*!< TIM  capture/compare mode register 2,        Address offset: 0x1C */
+    volatile uint32_t CCER;  /*!< TIM capture/compare enable register,         Address offset: 0x20 */
+    volatile uint32_t CNT;   /*!< TIM counter register,                        Address offset: 0x24 */
+    volatile uint32_t PSC;   /*!< TIM prescaler register,                      Address offset: 0x28 */
+    volatile uint32_t ARR;   /*!< TIM auto-reload register,                    Address offset: 0x2C */
+    volatile uint32_t RCR;   /*!< TIM  repetition counter register,            Address offset: 0x30 */
+    volatile uint32_t CCR1;  /*!< TIM capture/compare register 1,              Address offset: 0x34 */
+    volatile uint32_t CCR2;  /*!< TIM capture/compare register 2,              Address offset: 0x38 */
+    volatile uint32_t CCR3;  /*!< TIM capture/compare register 3,              Address offset: 0x3C */
+    volatile uint32_t CCR4;  /*!< TIM capture/compare register 4,              Address offset: 0x40 */
+    volatile uint32_t BDTR;  /*!< TIM break and dead-time register,            Address offset: 0x44 */
+    volatile uint32_t DCR;   /*!< TIM DMA control register,                    Address offset: 0x48 */
+    volatile uint32_t DMAR;  /*!< TIM DMA address for full transfer register,  Address offset: 0x4C */
+    volatile uint32_t OR;    /*!< TIM option register,                         Address offset: 0x50 */
+} TIM_TypeDef;
+
 #endif
