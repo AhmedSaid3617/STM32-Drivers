@@ -15,7 +15,7 @@ vpath %.o $(OBJS_DIR)
 
 PROJECT_NAME = stm32_drivers
 CC = arm-none-eabi-
-CFLAGS = -mcpu=cortex-m3 -g -O0 -ffreestanding -mthumb -mfloat-abi=soft
+CFLAGS = -mcpu=cortex-m3 -g -O0 -ffreestanding -mthumb -mfloat-abi=soft -fdata-sections -ffunction-sections
 INCS = -I $(INC_DIR) -I $(DRIVERS_INC) -I $(UTILS_INC)
 LIBS = 
 SRC := $(wildcard *.c) $(wildcard $(SRC_DIR)/*.c) $(wildcard $(DRIVERS_SRC)/*.c) $(wildcard $(UTILS_SRC)/*.c)
@@ -37,7 +37,7 @@ $(OBJS_DIR)/%.o: %.s
 	$(CC)as $< -o $@ 
 
 $(PROJECT_NAME).elf: $(OBJ) $(AsOBJ)
-	$(CC)gcc -T STM32F103C6TX_FLASH.ld $(AsOBJ) $(OBJ) -o $@ -mcpu=cortex-m3 -mthumb
+	$(CC)gcc -T STM32F103C6TX_FLASH.ld $(AsOBJ) $(OBJ) -o $@ -mcpu=cortex-m3 -mthumb -Wl,--gc-sections
 
 $(PROJECT_NAME).bin: $(PROJECT_NAME).elf
 	$(CC)objcopy -O binary $< $@

@@ -41,4 +41,6 @@ typedef struct
 #define RCC_ADC1_ENABLE()   RCC->APB2ENR |= (1<<9)
 #define RCC_ADC2_ENABLE()   RCC->APB2ENR |= (1<<10)
 
+#define RCC_TIM2_ENABLE()   RCC->APB1ENR |= (1<<0)
+
 #endif

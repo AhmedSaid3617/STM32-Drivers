@@ -85,3 +85,8 @@ void HardFault_Handler()
         SysTick_delay_ms(1000);
     };
 }
+
+void _putchar(char character)
+{
+    //UART_send_byte(USART3, character);
+}
