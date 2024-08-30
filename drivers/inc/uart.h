@@ -3,21 +3,22 @@
 
 #include "stm32f103c6.h"
 #include "systick.h"
+#include "gpio.h"
 
 #define USART1 ((USART_TypeDef*)(USART1_BASE))
 #define USART2 ((USART_TypeDef*)(USART2_BASE))
 #define USART3 ((USART_TypeDef*)(USART3_BASE))
 
 typedef enum {
-    UART_MODE_TX,
-    UART_MODE_RX,
-    UART_MODE_FULL_DUPLEX
+    UART_MODE_TX,           /* UART TX only is on. */
+    UART_MODE_RX,           /* UART RX only is on. */
+    UART_MODE_FULL_DUPLEX   /* Both UART TX and RX are on. */
 } UART_mode;
 
 typedef enum {
-    UART_STATUS_SUCCESS,
-    UART_STATUS_TX_FULL,
-    UART_STATUS_RX_EMPTY,
+    UART_STATUS_SUCCESS,    /* UART send or receive operation succeeded. */
+    UART_STATUS_TX_FULL,    /* Another transmit operation is underway. */
+    UART_STATUS_RX_EMPTY,   /* Nothing to receive. */
 } UART_status;
 
 /**
@@ -31,6 +32,8 @@ typedef struct
 } UART_Init_t;
 
 void UART_Init(UART_Init_t* init_handle);
+void UART_TX_cfg(GPIO_TypeDef* gpio_base, uint8_t pin);
+void UART_RX_cfg(GPIO_TypeDef* gpio_base, uint8_t pin);
 UART_status UART_receive_byte(USART_TypeDef* uart_base, uint8_t* dest);
 UART_status UART_send_byte(USART_TypeDef* uart_base, uint8_t byte);
 UART_status UART_printf(USART_TypeDef *uart_base, uint8_t* data);

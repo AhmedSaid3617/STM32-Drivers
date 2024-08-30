@@ -1,58 +1,56 @@
 #include "rcc.h"
-#include "gpio.h"
 #include "uart.h"
-#include "nvic.h"
-#include "timer.h"
 #include "systick.h"
-
-GPIO_Init_t gpio_init_handle;
-UART_Init_t uart_init_handle;
-timer_init_typedef timer_init_handle;
-char string[14] = "H\n";
+#include "gpio.h"
 
 void SysClk_init();
+
+UART_Init_t uart_init_handle;
+GPIO_Init_t gpio_init_handle;
 
 int main()
 {
     SysClk_init();
-    RCC_PORTB_ENABLE();
-    RCC_USART3_ENABLE();
-    RCC_TIM2_ENABLE();
 
-    _enable_irq();
+    uint8_t rec_char = 0;
+    RCC_USART3_ENABLE();
+    RCC_PORTA_ENABLE();
+    RCC_PORTB_ENABLE();
+
+    // PA8 OUT
+    gpio_init_handle.mode = GPIO_MODE_OUTPUT_PP;
+    gpio_init_handle.gpio_base = GPIOA;
+    gpio_init_handle.pin = 8;
+    gpio_init_handle.speed = GPIO_SPEED_10MHZ;
+    GPIO_init(&gpio_init_handle);
 
     // PB10 (TX) AFIO Pull Push
-    gpio_init_handle.gpio_base = GPIOB;
-    gpio_init_handle.mode = GPIO_MODE_AFIO_PP;
-    gpio_init_handle.pin = 10;
-    GPIO_init(&gpio_init_handle);
+    UART_TX_cfg(GPIOB, 10);
+
+    // PB11 (RX) GPIO Input floating
+    UART_RX_cfg(GPIOB, 11);
 
     // Initialize USART3
     uart_init_handle.baud_rate = 9600;
     uart_init_handle.USART_base = USART3;
-    uart_init_handle.mode = UART_MODE_TX;
+    uart_init_handle.mode = UART_MODE_FULL_DUPLEX;
     UART_Init(&uart_init_handle);
-
-    NVIC_enable_IRQ(TIM2_IRQn, 2);
-
-    timer_init_handle.timer_base = TIM2;
-    timer_init_handle.prescaler = 7999; // Prescaler = 8000 (8Mhz/8000 = 1000 Hz).
-    timer_init_handle.period = 499; // Reload value = 999 (1000 ticks).
-
-    timer_init(&timer_init_handle);
 
     while (1)
     {
-        int x = 10;
+        if (UART_receive_byte(USART3, &rec_char) == UART_STATUS_SUCCESS)
+        {
+            if (rec_char == 'B')
+            {
+                GPIO_write_pin(GPIOA, 8, 1);
+                SysTick_delay_ms(3000);
+                GPIO_write_pin(GPIOA, 8, 0);
+                UART_send_byte(USART3, 'H');
+            }
+        }
     }
 
     return 0;
-}
-
-void TIM2_IRQHandler(){
-    TIM2->SR &= ~(1<<0); // Clear update interrupt flag.
-    UART_printf(USART3, string);
-    NVIC_CLEAR_PENDING(TIM2_IRQn);
 }
 
 void SysClk_init(){

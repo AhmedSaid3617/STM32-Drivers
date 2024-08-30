@@ -4,7 +4,7 @@
  * @brief Initialize a USART module for asynchronus serial communication.
  * @warning APB1 and APB2 must have the same clock frequnecy or else the baud rate will not be calculated correctly.
  * @param init_handle Parameters for initialization.
- * @attention Make sure to initialize the pins for TX/RX using GPIO_Init.
+ * @attention Make sure to initialize the pins for TX/RX using UART_TX_cfg/UART_RX_cfg.
  */
 void UART_Init(UART_Init_t *init_handle)
 {
@@ -32,10 +32,37 @@ void UART_Init(UART_Init_t *init_handle)
     }
 }
 
-// TODO: configure pins function.
+/**
+ * @brief Configure pin for TX.
+ * 
+ * @param gpio_base Base address for the port containing the pin. 
+ * @param pin Pin number.
+ */
+void UART_TX_cfg(GPIO_TypeDef* gpio_base, uint8_t pin){
+    GPIO_Init_t gpio_init_handle;
+    gpio_init_handle.gpio_base = gpio_base;
+    gpio_init_handle.mode = GPIO_MODE_AFIO_PP;
+    gpio_init_handle.pin = pin;
+    GPIO_init(&gpio_init_handle);
+}
+
+/**
+ * @brief Configure pin for RX.
+ * 
+ * @param gpio_base Base address for the port containing the pin. 
+ * @param pin Pin number.
+ */
+void UART_RX_cfg(GPIO_TypeDef* gpio_base, uint8_t pin){
+    GPIO_Init_t gpio_init_handle;
+    gpio_init_handle.gpio_base = gpio_base;
+    gpio_init_handle.mode = GPIO_MODE_INPUT_FLOATING;
+    gpio_init_handle.pin = pin;
+    GPIO_init(&gpio_init_handle);
+}
 
 /**
  * @brief Receive one byte from a USART module.
+ * 
  * @param uart_base Base address for the USART module.
  * @param dest Pointer to the variable in which to store the received byte.
  * @return Returns a status, either UART_STATUS_SUCCESS if recieved successfully, or UART_STATUS_RX_EMPTY if there's nothing to receive.
