@@ -10,10 +10,16 @@
 #define USART3 ((USART_TypeDef*)(USART3_BASE))
 
 typedef enum {
-    UART_MODE_TX,           /* UART TX only is on. */
-    UART_MODE_RX,           /* UART RX only is on. */
-    UART_MODE_FULL_DUPLEX   /* Both UART TX and RX are on. */
+    UART_MODE_POLLING,
+    UART_MODE_INTERRUPT,
+    UART_MODE_DMA
 } UART_mode;
+
+typedef enum {
+    UART_DIR_TX,           /* UART TX only is on. */
+    UART_DIR_RX,           /* UART RX only is on. */
+    UART_DIR_FULL_DUPLEX   /* Both UART TX and RX are on. */
+} UART_direction;
 
 typedef enum {
     UART_STATUS_SUCCESS,    /* UART send or receive operation succeeded. */
@@ -29,6 +35,7 @@ typedef struct
     USART_TypeDef* USART_base;
     uint32_t baud_rate;
     UART_mode mode;
+    UART_direction direction;
 } UART_Init_t;
 
 void UART_Init(UART_Init_t* init_handle);

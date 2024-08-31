@@ -15,19 +15,33 @@ void UART_Init(UART_Init_t *init_handle)
     init_handle->USART_base->BRR |= baud_div_mantissa << 4;
     init_handle->USART_base->BRR |= baud_div_fraction;
 
-    switch (init_handle->mode)
+    switch (init_handle->direction)
     {
-    case UART_MODE_RX:
+    case UART_DIR_RX:
         init_handle->USART_base->CR1 |= (1 << 2); // Enable RX
+        if (init_handle->mode == UART_MODE_DMA)
+        {
+            init_handle->USART_base->CR3 |= 1 << 6; // Enable DMA receiver.
+        }
+        
         break;
 
-    case UART_MODE_TX:
+    case UART_DIR_TX:
         init_handle->USART_base->CR1 |= (1 << 3); // Enable TX
+        if (init_handle->mode == UART_MODE_DMA)
+        {
+            init_handle->USART_base->CR3 |= 1 << 7; // Enable DMA transmitter.
+        }
         break;
 
-    case UART_MODE_FULL_DUPLEX:
+    case UART_DIR_FULL_DUPLEX:
         init_handle->USART_base->CR1 |= (1 << 2); // Enable RX
         init_handle->USART_base->CR1 |= (1 << 3); // Enable TX
+        if (init_handle->mode == UART_MODE_DMA)
+        {
+            init_handle->USART_base->CR3 |= 1 << 6; // Enable DMA receiver.
+            init_handle->USART_base->CR3 |= 1 << 7; // Enable DMA transmitter.
+        }
         break;
     }
 }
