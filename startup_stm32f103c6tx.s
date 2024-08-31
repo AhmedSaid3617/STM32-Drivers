@@ -77,6 +77,7 @@ isr_vectors:
 .thumb_func
 Reset_Handler:
     bl CopyDataInit
+    bl BssInit
     bl main
 halt:
     b halt
@@ -94,6 +95,21 @@ LoopCopyDataInit:
     add r1, r1, #4
     b LoopCopyDataInit
 CopyDataInitReturn:
+    bx lr
+
+BssInit:
+    ldr r2, =_sbss
+    ldr r4, =_ebss
+    movs r3, #0
+    b LoopFillZerobss
+
+FillZerobss:
+    str  r3, [r2]
+    add  r2, r2, #4
+
+LoopFillZerobss:
+    cmp r2, r4
+    bcc FillZerobss
     bx lr
 
 .weak	SysTick_Handler
