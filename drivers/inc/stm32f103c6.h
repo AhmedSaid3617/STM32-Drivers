@@ -220,4 +220,18 @@ typedef struct
     volatile uint32_t OR;    /*!< TIM option register,                         Address offset: 0x50 */
 } TIM_TypeDef;
 
+typedef struct
+{
+    volatile uint32_t CCR;
+    volatile uint32_t CNDTR;
+    volatile uint32_t CPAR;
+    volatile uint32_t CMAR;
+} DMA_Channel_TypeDef;
+
+typedef struct
+{
+    volatile uint32_t ISR;
+    volatile uint32_t IFCR;
+} DMA_TypeDef;
+
 #endif

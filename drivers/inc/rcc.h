@@ -43,4 +43,6 @@ typedef struct
 
 #define RCC_TIM2_ENABLE()   RCC->APB1ENR |= (1<<0)
 
+#define RCC_DMA1_ENABLE()   RCC->AHBENR |= (1<<0)
+
 #endif
