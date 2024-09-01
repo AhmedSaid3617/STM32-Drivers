@@ -1,24 +1,27 @@
+OBJS_DIR = build
+
 SRC_DIR = src
 DRIVERS_SRC = drivers/src
 UTILS_SRC = utils/src
-
-OBJS_DIR = build
+EXT_SRC = ext_modules/src
 
 INC_DIR = inc
 DRIVERS_INC = drivers/inc
 UTILS_INC = utils/inc
+EXT_INC = ext_modules/inc
 
 vpath %.c $(SRC_DIR)
 vpath %.c $(DRIVERS_SRC)
 vpath %.c $(UTILS_SRC)
+vpath %.c $(EXT_SRC)
 vpath %.o $(OBJS_DIR)
 
 PROJECT_NAME = stm32_drivers
 CC = arm-none-eabi-
 CFLAGS = -mcpu=cortex-m3 -g -O0 -ffreestanding -mthumb -mfloat-abi=soft -fdata-sections -ffunction-sections
-INCS = -I $(INC_DIR) -I $(DRIVERS_INC) -I $(UTILS_INC)
+INCS = -I $(INC_DIR) -I $(DRIVERS_INC) -I $(UTILS_INC) -I $(EXT_INC)
 LIBS = 
-SRC := $(wildcard *.c) $(wildcard $(SRC_DIR)/*.c) $(wildcard $(DRIVERS_SRC)/*.c) $(wildcard $(UTILS_SRC)/*.c)
+SRC := $(wildcard *.c) $(wildcard $(SRC_DIR)/*.c) $(wildcard $(DRIVERS_SRC)/*.c) $(wildcard $(UTILS_SRC)/*.c) $(wildcard $(EXT_SRC)/*.c)
 OBJ := $(addprefix $(OBJS_DIR)/, $(notdir $(SRC:.c=.o)))
 AS = $(wildcard *.s)
 AsOBJ = $(addprefix $(OBJS_DIR)/, $(notdir $(AS:.s=.o)))
