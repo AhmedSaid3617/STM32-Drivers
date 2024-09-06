@@ -23,6 +23,10 @@ typedef enum {
     I2C_STATUS_TIMEOUT ///< No data received in a long time.
 } I2C_status;
 
+/**
+ * @brief Not used.
+ * @attention Not currently used.
+ */
 typedef struct
 {
     I2C_TypeDef* I2C_base;

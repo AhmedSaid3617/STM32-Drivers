@@ -2,61 +2,46 @@
 #include "uart.h"
 #include "systick.h"
 #include "gpio.h"
-#include "dma.h"
+#include "i2c.h"
 
 void SysClk_init();
 
 UART_Init_t uart_init_handle;
 GPIO_Init_t gpio_init_handle;
-DMA_init_typedef dma_init_handle;
+I2C_init_t i2c_init_handle;
 
 uint8_t message[10];
 
 int main()
 {
     SysClk_init();
-    
+    RCC_I2C1_ENABLE();
     RCC_USART3_ENABLE();
-    RCC_PORTA_ENABLE();
-    RCC_PORTB_ENABLE();
-    RCC_DMA1_ENABLE();
 
-    // PA8 OUT
-    gpio_init_handle.mode = GPIO_MODE_OUTPUT_PP;
-    gpio_init_handle.gpio_base = GPIOA;
-    gpio_init_handle.pin = 8;
-    gpio_init_handle.speed = GPIO_SPEED_10MHZ;
-    GPIO_init(&gpio_init_handle);
+    // Initialize I2C1 module.
+    i2c_init_handle.I2C_base = I2C1;
+    i2c_init_handle.mode = I2C_MODE_MASTER;
+    I2C_init(I2C1);
+
+    // Initialize USART3
+    uart_init_handle.USART_base = USART3;
+    uart_init_handle.baud_rate = 9600;
+    uart_init_handle.direction = UART_DIR_TX;
+    uart_init_handle.mode = UART_MODE_POLLING;
+    UART_Init(&uart_init_handle);
 
     // PB10 (TX) AFIO Pull Push
     UART_TX_cfg(GPIOB, 10);
 
-    // PB11 (RX) GPIO Input floating
-    UART_RX_cfg(GPIOB, 11);
+    uint8_t data[] = {0x00, 0xAE, 0xD5, 0xF0, 0xA8, 64 - 1, 0x8D, 0x14, 0xAF, 0xA5};
 
-    // Initialize USART3
-    uart_init_handle.baud_rate = 9600;
-    uart_init_handle.USART_base = USART3;
-    uart_init_handle.direction = UART_DIR_FULL_DUPLEX;
-    uart_init_handle.mode = UART_MODE_DMA;
-    UART_Init(&uart_init_handle);
-
-    // Initialize DMA
-    dma_init_handle.dma_channel = DMA1_Channel3; // Set to channel 3.
-    dma_init_handle.peripheral_register = USART3_BASE + 0x4; // Put USART3_DR as the peripheral address.
-    dma_init_handle.memory_address = &message; // Put the address of message variable as the memory address.
-    dma_init_handle.data_count = 9; // Transfer 9 bytes.
-    dma_init_handle.priority = DMA_PRI_MEDIUM; // Set priority to medium.
-    dma_init_handle.mem_inc = 1; // Memory increment.
-    DMA_channel_init(&dma_init_handle);
+    uint8_t oled_status = I2C_master_send(I2C1, 0x3C, &data, 10);
+    
 
     while (1)
     {
-        UART_printf(USART3, message);
+        UART_send_byte(USART3, oled_status);
         SysTick_delay_ms(1000);
-        DMA1_Channel3->CCR &= ~(1 << 0); // Disable channel.
-        DMA1_Channel3->CNDTR = 9;        // Transfer 9 bytes.
-        DMA1_Channel3->CCR |= 1;         // Enable channel.
     }
 
     return 0;
