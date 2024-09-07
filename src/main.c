@@ -2,30 +2,50 @@
 #include "uart.h"
 #include "systick.h"
 #include "gpio.h"
-#include "dma.h"
+#include "timer.h"
+#include "nvic.h"
+#include "exti.h"
+#include "printf.h"
 
 void SysClk_init();
 
 UART_Init_t uart_init_handle;
 GPIO_Init_t gpio_init_handle;
-DMA_init_typedef dma_init_handle;
+timer_init_typedef timer_init_handle;
+
+uint32_t ticks = 0;
+uint32_t echo_delay = 0;
+float distance = 0.0;
+uint8_t distance_str[25] = {};
 
 uint8_t message[10];
 
 int main()
 {
     SysClk_init();
-    
+
     RCC_USART3_ENABLE();
     RCC_PORTA_ENABLE();
     RCC_PORTB_ENABLE();
-    RCC_DMA1_ENABLE();
+    RCC_TIM2_ENABLE();
+    RCC_AFIO_ENABLE();
+
+    SysTick_interrupt_init(1);
 
     // PA8 OUT
     gpio_init_handle.mode = GPIO_MODE_OUTPUT_PP;
     gpio_init_handle.gpio_base = GPIOA;
     gpio_init_handle.pin = 8;
     gpio_init_handle.speed = GPIO_SPEED_10MHZ;
+    GPIO_init(&gpio_init_handle);
+
+    // PA9 OUT
+    gpio_init_handle.pin = 9;
+    GPIO_init(&gpio_init_handle);
+
+    // PA4 IN pull down
+    gpio_init_handle.pin = 4;
+    gpio_init_handle.mode = GPIO_MODE_INPUT_PULL_DOWN;
     GPIO_init(&gpio_init_handle);
 
     // PB10 (TX) AFIO Pull Push
@@ -41,25 +61,82 @@ int main()
     uart_init_handle.mode = UART_MODE_DMA;
     UART_Init(&uart_init_handle);
 
-    // Initialize DMA
-    dma_init_handle.dma_channel = DMA1_Channel3; // Set to channel 3.
-    dma_init_handle.peripheral_register = USART3_BASE + 0x4; // Put USART3_DR as the peripheral address.
-    dma_init_handle.memory_address = &message; // Put the address of message variable as the memory address.
-    dma_init_handle.data_count = 9; // Transfer 9 bytes.
-    dma_init_handle.priority = DMA_PRI_MEDIUM; // Set priority to medium.
-    dma_init_handle.mem_inc = 1; // Memory increment.
-    DMA_channel_init(&dma_init_handle);
+    timer_init_handle.timer_base = TIM2;
+    timer_init_handle.prescaler = 3;
+    timer_init_handle.period = 60000;
+    timer_init(&timer_init_handle);
+    //timer_reset(TIM2);
+    NVIC_enable_IRQ(TIM2_IRQn, 1);
+
+    // Enable EXTI for PA4.
+    EXTI_enable(EXTI_PORTA, 4, 1, 0);
+    // NVIC_enable_IRQ(EXTI4_IRQn, 2);
 
     while (1)
     {
-        UART_printf(USART3, message);
-        SysTick_delay_ms(1000);
-        DMA1_Channel3->CCR &= ~(1 << 0); // Disable channel.
-        DMA1_Channel3->CNDTR = 9;        // Transfer 9 bytes.
-        DMA1_Channel3->CCR |= 1;         // Enable channel.
+        distance = (echo_delay / 2) / 58.0;
+        sprintf(distance_str, "D: %d\n", echo_delay);
     }
 
     return 0;
+}
+
+void SysTick_Handler()
+{
+    if (ticks % 1000 == 0)
+    {
+        // UART_printf(USART3, distance_str);
+    }
+
+    if (ticks % 250 == 0)
+    {
+        echo_delay = TIM2->CNT;
+        sprintf(distance_str, "T: %d\n", echo_delay);
+        UART_printf(USART3, distance_str);
+        // Arm EXTI
+        NVIC_enable_IRQ(EXTI4_IRQn, 2);
+
+        // Send pulse.
+        /* GPIO_write_pin(GPIOA, 9, 1);
+        for (int i = 0; i < 150; i++)
+        {
+            
+        }
+        GPIO_write_pin(GPIOA, 9, 0); */
+
+        // Start timer
+        TIM2->CR1 |= 1 << 0; // Counter enable.
+    }
+
+    ticks++;
+}
+
+void TIM2_IRQHandler()
+{
+    //timer_reset(TIM2);
+
+    GPIO_write_pin(GPIOA, 8, 1);
+    for (int i = 0; i < 100000; i++)
+    {
+        /* code */
+    }
+
+    GPIO_write_pin(GPIOA, 8, 0);
+
+    NVIC_CLEAR_PENDING(TIM2_IRQn);
+    NVIC_disable_IRQ(EXTI4_IRQn);
+}
+
+void EXTI4_IRQHandler()
+{
+    echo_delay = TIM2->CNT;
+    timer_reset(TIM2);
+    sprintf(distance_str, "E: %d\n", echo_delay);
+    UART_printf(USART3, distance_str);
+
+    EXTI_CLEAR_PENDING(4);
+    NVIC_CLEAR_PENDING(EXTI4_IRQn);
+    NVIC_disable_IRQ(EXTI4_IRQn);
 }
 
 void SysClk_init()

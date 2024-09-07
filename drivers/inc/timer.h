@@ -18,5 +18,6 @@ typedef struct
 
 
 void timer_init(timer_init_typedef* timer_init_handle);
+void timer_reset(TIM_TypeDef* timer_base);
 
 #endif
