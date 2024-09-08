@@ -13,5 +13,6 @@ void _enable_irq();
 void _disable_irq();
 
 extern inline void NVIC_enable_IRQ(IRQn_Type IRQn, uint8_t priority);
+extern inline void NVIC_disable_IRQ(IRQn_Type IRQn);
 
 #endif

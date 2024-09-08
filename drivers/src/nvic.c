@@ -12,3 +12,7 @@ extern inline void NVIC_enable_IRQ(IRQn_Type IRQn, uint8_t priority){
     NVIC->ISER[IRQn >> 5] |= 1 << (IRQn & 31UL);
     NVIC->IP[IRQn] = (uint8_t)((priority & 0xF) << 4);
 }
+
+extern inline void NVIC_disable_IRQ(IRQn_Type IRQn){
+    NVIC->ICER[IRQn >> 5] |= 1 << (IRQn & 31UL);
+}
