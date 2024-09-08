@@ -7,6 +7,9 @@
 #include "exti.h"
 #include "printf.h"
 
+#define TRIGGER 9
+#define ECHO 10
+
 void SysClk_init();
 
 UART_Init_t uart_init_handle;
@@ -40,11 +43,11 @@ int main()
     GPIO_init(&gpio_init_handle);
 
     // PA9 OUT
-    gpio_init_handle.pin = 9;
+    gpio_init_handle.pin = TRIGGER;
     GPIO_init(&gpio_init_handle);
 
-    // PA4 IN pull down
-    gpio_init_handle.pin = 4;
+    // PA10 IN pull down
+    gpio_init_handle.pin = ECHO;
     gpio_init_handle.mode = GPIO_MODE_INPUT_PULL_DOWN;
     GPIO_init(&gpio_init_handle);
 
@@ -65,17 +68,17 @@ int main()
     timer_init_handle.prescaler = 3;
     timer_init_handle.period = 60000;
     timer_init(&timer_init_handle);
-    //timer_reset(TIM2);
+    timer_reset(TIM2);
     NVIC_enable_IRQ(TIM2_IRQn, 1);
 
-    // Enable EXTI for PA4.
-    EXTI_enable(EXTI_PORTA, 4, 1, 0);
-    // NVIC_enable_IRQ(EXTI4_IRQn, 2);
+    // Enable EXTI for PA10.
+    EXTI_enable(EXTI_PORTA, ECHO, 1, 1);
+    //NVIC_enable_IRQ(EXTI15_10_IRQn, 2);
 
     while (1)
     {
         distance = (echo_delay / 2) / 58.0;
-        sprintf(distance_str, "D: %d\n", echo_delay);
+        sprintf(distance_str, "D: %.2f\n", distance);
     }
 
     return 0;
@@ -85,58 +88,65 @@ void SysTick_Handler()
 {
     if (ticks % 1000 == 0)
     {
-        // UART_printf(USART3, distance_str);
+        UART_printf(USART3, distance_str);
     }
 
     if (ticks % 250 == 0)
     {
         echo_delay = TIM2->CNT;
-        sprintf(distance_str, "T: %d\n", echo_delay);
-        UART_printf(USART3, distance_str);
         // Arm EXTI
-        NVIC_enable_IRQ(EXTI4_IRQn, 2);
+        NVIC_enable_IRQ(EXTI15_10_IRQn, 2);
 
         // Send pulse.
-        /* GPIO_write_pin(GPIOA, 9, 1);
-        for (int i = 0; i < 150; i++)
+        GPIO_write_pin(GPIOA, TRIGGER, 0);
+        for (int i = 0; i < 20; i++)
         {
-            
         }
-        GPIO_write_pin(GPIOA, 9, 0); */
-
-        // Start timer
-        TIM2->CR1 |= 1 << 0; // Counter enable.
+        GPIO_write_pin(GPIOA, TRIGGER, 1);
+        for (int i = 0; i < 100; i++)
+        {
+        }
+        GPIO_write_pin(GPIOA, TRIGGER, 0);
     }
 
     ticks++;
 }
 
-void TIM2_IRQHandler()
+/* void TIM2_IRQHandler()
 {
-    //timer_reset(TIM2);
+    // timer_reset(TIM2);
 
     GPIO_write_pin(GPIOA, 8, 1);
+
     for (int i = 0; i < 100000; i++)
     {
-        /* code */
+        
     }
 
     GPIO_write_pin(GPIOA, 8, 0);
 
     NVIC_CLEAR_PENDING(TIM2_IRQn);
-    NVIC_disable_IRQ(EXTI4_IRQn);
-}
+    NVIC_disable_IRQ(EXTI15_10_IRQn);
+} */
 
-void EXTI4_IRQHandler()
+void EXTI15_10_IRQHandler()
 {
-    echo_delay = TIM2->CNT;
-    timer_reset(TIM2);
-    sprintf(distance_str, "E: %d\n", echo_delay);
-    UART_printf(USART3, distance_str);
+    if (GPIO_read_pin(GPIOA, ECHO))
+    {
+        // At rising edge, start timer.
+        TIM2->CR1 |= 1 << 0; // Counter enable.
+    }
 
-    EXTI_CLEAR_PENDING(4);
-    NVIC_CLEAR_PENDING(EXTI4_IRQn);
-    NVIC_disable_IRQ(EXTI4_IRQn);
+    else
+    {
+        // At falling edge, record time and stop timer.
+        echo_delay = TIM2->CNT;
+        timer_reset(TIM2);
+        NVIC_disable_IRQ(EXTI15_10_IRQn);
+    }
+
+    EXTI_CLEAR_PENDING(10);
+    NVIC_CLEAR_PENDING(EXTI15_10_IRQn); 
 }
 
 void SysClk_init()
