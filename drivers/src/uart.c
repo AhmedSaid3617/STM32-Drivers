@@ -111,12 +111,11 @@ UART_status UART_send_byte(USART_TypeDef *uart_base, uint8_t byte)
     return UART_STATUS_TX_FULL;
 }
 
-// TODO: insert comment.
 /**
- * @brief 
+ * @brief Print a string from the given address data.
  * 
- * @param uart_base 
- * @param data 
+ * @param uart_base The USART module to send data over.
+ * @param data The base address of the string to be sent.
  * @return UART_status 
  */
 UART_status UART_printf(USART_TypeDef *uart_base, uint8_t *data)

@@ -64,6 +64,7 @@ void GPIO_init(GPIO_Init_t* init_handle){
 
 }
 
+// TODO: use the bit-mapped registers to make this atomic.
 /**
  * @brief Read the boolean value from an input pin.
  * @return The value at the gpio port masked for this pin.
@@ -72,6 +73,7 @@ uint32_t GPIO_read_pin(GPIO_TypeDef* gpio_base, uint8_t pin){
     return gpio_base->IDR & (1<<pin);
 }
 
+// TODO: use the bit-mapped registers to make this atomic.
 /**
  * @brief Write one or zero to a gpio pin configured to output.
  * @param value Value to be written to the pin, should be either 1 or 0.
