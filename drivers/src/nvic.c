@@ -1,8 +1,8 @@
 #include "nvic.h"
 
-void _enable_irq(){
+/* extern inline void _enable_irq(void){
     __asm__("CPSIE i");
-}
+} */
 
 void _disable_irq(){
     __asm__("CPSID i");
