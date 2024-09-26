@@ -8,6 +8,7 @@
             "name": "Cortex Debug",
             "cwd": "${workspaceFolder}",
             "executable": "stm32_drivers.elf",
+            "debuggerArgs": ["-nx"],
             "request": "launch",
             "type": "cortex-debug",
             "runToEntryPoint": "main",
