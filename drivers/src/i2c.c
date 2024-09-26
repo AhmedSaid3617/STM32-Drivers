@@ -88,15 +88,19 @@ I2C_status I2C_master_send(I2C_TypeDef *I2C_base, uint8_t slave_address, uint8_t
     if (I2C1->SR2)
         ; // Read SR2 to clear ADDR bit
 
+    while (!(I2C1->SR1 & (1 << 7)))
+        ; // Wait while TX not empty.
+
     for (volatile uint8_t *i = data_ptr; i < data_ptr + data_size; i++)
     {
-        while (!(I2C1->SR1 & (1 << 7)))
-            ;                    // Wait while TX not empty.
         I2C1->DR = *i;           // Write byte to data register.
         if (I2C1->SR1 & 1 << 10) // In case of NACK condition.
         {
             return I2C_STATUS_NACK;
         }
+
+        while (!(I2C1->SR1 & (1 << 7)))
+            ; // Wait while TX not empty.
     }
 
     // Send stop transmission.
