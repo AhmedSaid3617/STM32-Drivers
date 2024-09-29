@@ -26,24 +26,14 @@ OBJ := $(addprefix $(OBJS_DIR)/, $(notdir $(SRC:.c=.o)))
 AS = $(wildcard *.s)
 AsOBJ = $(addprefix $(OBJS_DIR)/, $(notdir $(AS:.s=.o)))
 
-.PHONY: flash
-flash: build
-	openocd -f stlink.cfg -c "program $(PROJECT_NAME).elf verify reset exit"
-
 .PHONY: build
-build: build_dir $(PROJECT_NAME).bin
+build: build_dir $(OBJ) $(AsOBJ)
 
 $(OBJS_DIR)/%.o: %.c
 	$(CC)gcc $< -c $(INCS) -o $@  $(CFLAGS)
 
 $(OBJS_DIR)/%.o: %.s
 	$(CC)as $< -o $@ 
-
-$(PROJECT_NAME).elf: $(OBJ) $(AsOBJ)
-	$(CC)gcc -T STM32F103C6TX_FLASH.ld $(AsOBJ) $(OBJ) -o $@ -mcpu=cortex-m3 -mthumb -Wl,--gc-sections
-
-$(PROJECT_NAME).bin: $(PROJECT_NAME).elf
-	$(CC)objcopy -O binary $< $@
 
 clean:
 	rm *.elf -f
