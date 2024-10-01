@@ -30,7 +30,7 @@ void OLED_init(I2C_TypeDef *I2C_base, frame_t *frame)
  * 
  * @param frame The frame object to draw on. It should be sent to OLED display.
  */
-void OLED_draw_rectangle(frame_t *frame, uint8_t x, uint8_t y, uint8_t length, uint8_t width)
+void OLED_draw_rectangle(frame_t *frame, uint8_t x, uint8_t y, uint8_t width, uint8_t length)
 {
     // Clear the frame.
     for (int i = 0; i < 8; i++)
@@ -72,5 +72,14 @@ void OLED_draw_rectangle(frame_t *frame, uint8_t x, uint8_t y, uint8_t length, u
     {
         frame->pixels[y / 8 + i][j] = 0xff >> 8 - length;
     }
+}
 
+/**
+ * @brief Send a frame_t object to the OLED display to be displayed.
+ * 
+ * @param I2C_base I2C module connected to the OLED.
+ * @param frame The frame_t object that will be written to the OLED display.
+ */
+void OLED_send_frame(I2C_TypeDef* I2C_base, frame_t* frame_p){
+    I2C_master_send(I2C_base, 0x3C, frame_p, 1025);
 }

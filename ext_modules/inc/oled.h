@@ -10,5 +10,7 @@ typedef struct
 } frame_t;
 
 void OLED_init(I2C_TypeDef* I2C_base, frame_t* frame);
-void OLED_draw_rectangle(frame_t* frame, uint8_t x, uint8_t y, uint8_t length, uint8_t width);
+void OLED_draw_rectangle(frame_t *frame, uint8_t x, uint8_t y, uint8_t width, uint8_t length);
+void OLED_send_frame(I2C_TypeDef* I2C_base, frame_t* frame_p);
+
 #endif
