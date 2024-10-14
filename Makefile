@@ -4,24 +4,32 @@ SRC_DIR = src
 DRIVERS_SRC = drivers/src
 UTILS_SRC = utils/src
 EXT_SRC = ext_modules/src
+RTOS_KERNEL_SRC = FreeRTOS-Kernel
+RTOS_PORT_SRC = FreeRTOS-Kernel/portable/GCC/ARM_CM3
+RTOS_MEMMANG = FreeRTOS-Kernel/portable/MemMang
 
 INC_DIR = inc
 DRIVERS_INC = drivers/inc
 UTILS_INC = utils/inc
 EXT_INC = ext_modules/inc
+RTOS_INC = FreeRTOS-Kernel/include
 
 vpath %.c $(SRC_DIR)
 vpath %.c $(DRIVERS_SRC)
 vpath %.c $(UTILS_SRC)
 vpath %.c $(EXT_SRC)
+vpath %.c $(RTOS_KERNEL_SRC)
+vpath %.c $(RTOS_PORT_SRC)
+vpath %.c $(RTOS_MEMMANG)
 vpath %.o $(OBJS_DIR)
 
 PROJECT_NAME = stm32_drivers
 CC = arm-none-eabi-
 CFLAGS = -mcpu=cortex-m3 -g -O0 -ffreestanding -mthumb -mfloat-abi=soft -fdata-sections -ffunction-sections
-INCS = -I $(INC_DIR) -I $(DRIVERS_INC) -I $(UTILS_INC) -I $(EXT_INC)
+INCS = -I $(INC_DIR) -I $(DRIVERS_INC) -I $(UTILS_INC) -I $(EXT_INC) -I $(RTOS_INC) -I $(RTOS_PORT_SRC)
 LIBS = 
-SRC := $(wildcard *.c) $(wildcard $(SRC_DIR)/*.c) $(wildcard $(DRIVERS_SRC)/*.c) $(wildcard $(UTILS_SRC)/*.c) $(wildcard $(EXT_SRC)/*.c)
+SRC := $(wildcard *.c) $(wildcard $(SRC_DIR)/*.c) $(wildcard $(DRIVERS_SRC)/*.c) $(wildcard $(UTILS_SRC)/*.c) $(wildcard $(EXT_SRC)/*.c) $(wildcard $(RTOS_PORT_SRC)/*.c)
+SRC += $(RTOS_KERNEL_SRC)/tasks.c $(RTOS_KERNEL_SRC)/queue.c $(RTOS_KERNEL_SRC)/list.c $(RTOS_MEMMANG)/heap_1.c $(RTOS_KERNEL_SRC)/timers.c $(RTOS_KERNEL_SRC)/event_groups.c $(RTOS_KERNEL_SRC)/stream_buffer.c
 OBJ := $(addprefix $(OBJS_DIR)/, $(notdir $(SRC:.c=.o)))
 AS = $(wildcard *.s)
 AsOBJ = $(addprefix $(OBJS_DIR)/, $(notdir $(AS:.s=.o)))

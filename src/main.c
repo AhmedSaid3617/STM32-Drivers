@@ -4,77 +4,81 @@
 #include "gpio.h"
 #include "i2c.h"
 
-void SysClk_init();
+#include "FreeRTOS.h"
+#include "task.h"
 
-UART_Init_t uart_init_handle;
+void SysClk_init();
+void GreenTask(void *argument);
+void RedTask(void *argument);
+
 GPIO_Init_t gpio_init_handle;
-I2C_init_t i2c_init_handle;
-uint8_t data_byte = 0x40;
-uint8_t data[1025] = {};
-uint8_t ticks = 0;
 
 int main()
 {
     SysClk_init();
-    RCC_I2C1_ENABLE();
-    RCC_USART3_ENABLE();
-    RCC_PORTA_ENABLE();
     RCC_PORTB_ENABLE();
 
-    // Initialize I2C1 module.
-    i2c_init_handle.I2C_base = I2C1;
-    i2c_init_handle.mode = I2C_MODE_MASTER;
-    I2C_init(I2C1);
-
-    // Initialize USART3
-    uart_init_handle.USART_base = USART3;
-    uart_init_handle.baud_rate = 9600;
-    uart_init_handle.direction = UART_DIR_TX;
-    uart_init_handle.mode = UART_MODE_POLLING;
-    UART_Init(&uart_init_handle);
-
-    // PA8 Out
-    gpio_init_handle.gpio_base = GPIOA;
+    // PB1 Out
+    gpio_init_handle.gpio_base = GPIOB;
     gpio_init_handle.mode = GPIO_MODE_OUTPUT_PP;
-    gpio_init_handle.pin = 8;
+    gpio_init_handle.pin = 1;
     gpio_init_handle.speed = GPIO_SPEED_10MHZ;
     GPIO_init(&gpio_init_handle);
 
-    // PB10 (TX) AFIO Pull Push
-    UART_TX_cfg(GPIOB, 10);
+    // PB12 Out
+    gpio_init_handle.pin = 12;
+    GPIO_init(&gpio_init_handle);
 
-    uint8_t commands[] = {0x00, 0xAE, 0xD5, 0xF0, 0xA8, 64 - 1, 0x8D, 0x14, 0xAF, 0xA4, 0x20, 0x00};
-    uint8_t start[] = {0x00, 0x21, 0, 127, 0x22, 0, 7};
+    xTaskCreate(RedTask, "Red Task", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
+    xTaskCreate(GreenTask, "Green Task", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
 
-    I2C_master_send(I2C1, 0x3C, &commands, 12);
-    I2C_master_send(I2C1, 0x3C, &start, 7);
-    I2C_master_send(I2C1, 0x3C, &data_byte, 1025);
+    vTaskStartScheduler();
 
     while (1)
     {
-        for (int i = 0; i < 1024; i++)
-        {
-            if (ticks % 2 == 0)
-            {
-                data[i] = 0xAA;
-            }
-            else
-            {
-                data[i] = 0x55;
-            }
-        }
-
-        I2C_master_send(I2C1, 0x3C, &start, 7);
-        I2C_master_send(I2C1, 0x3C, &data_byte, 1025);
-        /* GPIO_write_pin(GPIOA, 8, 1);
-        SysTick_delay_ms(500);
-        GPIO_write_pin(GPIOA, 8, 0);
-        SysTick_delay_ms(500); */
-        SysTick_delay_ms(1000);
-        ticks++;
     }
 
     return 0;
+}
+
+void GreenTask(void *argument)
+{
+    while (1)
+    {
+        GPIO_write_pin(GPIOB, 12, 1);
+
+        for (int i = 0; i < 250000; i++)
+        {
+            /* code */
+        }
+
+        GPIO_write_pin(GPIOB, 12, 0);
+
+        for (int i = 0; i < 250000; i++)
+        {
+            /* code */
+        }
+    }
+}
+
+void RedTask(void *argument)
+{
+    while (1)
+    {
+        GPIO_write_pin(GPIOB, 1, 1);
+
+        for (int i = 0; i < 100000; i++)
+        {
+            /* code */
+        }
+
+        GPIO_write_pin(GPIOB, 1, 0);
+
+        for (int i = 0; i < 100000; i++)
+        {
+            /* code */
+        }
+    }
 }
 
 void SysClk_init()
@@ -107,3 +111,9 @@ void HardFault_Handler()
         SysTick_delay_ms(1000);
     };
 }
+
+/* void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName)
+{
+    HardFault_Handler();
+}
+ */
