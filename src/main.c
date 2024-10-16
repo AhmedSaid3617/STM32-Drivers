@@ -3,6 +3,7 @@
 #include "systick.h"
 #include "gpio.h"
 #include "i2c.h"
+#include "timer.h"
 
 #include "FreeRTOS.h"
 #include "task.h"
@@ -12,6 +13,7 @@ void GreenTask(void *argument);
 void RedTask(void *argument);
 
 GPIO_Init_t gpio_init_handle;
+UART_Init_t uart_init_handle;
 
 int main()
 {
@@ -29,8 +31,19 @@ int main()
     gpio_init_handle.pin = 12;
     GPIO_init(&gpio_init_handle);
 
-    xTaskCreate(RedTask, "Red Task", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
+    uart_init_handle.baud_rate = 9600;
+    uart_init_handle.direction = UART_DIR_FULL_DUPLEX;
+    uart_init_handle.USART_base = USART3;
+    UART_Init(&uart_init_handle);
+
+    // PB10 TX.
+    UART_TX_cfg(GPIOB, 10);
+
+    // PB11 RX.
+    UART_RX_cfg(GPIOB, 11);
+
     xTaskCreate(GreenTask, "Green Task", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
+    xTaskCreate(RedTask, "Red Task", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
 
     vTaskStartScheduler();
 
@@ -45,40 +58,29 @@ void GreenTask(void *argument)
 {
     while (1)
     {
+        GPIO_write_pin(GPIOB, 1, 0);
         GPIO_write_pin(GPIOB, 12, 1);
+        
 
-        for (int i = 0; i < 250000; i++)
+        /* for (int i = 0; i < 100000; i++)
         {
-            /* code */
-        }
-
-        GPIO_write_pin(GPIOB, 12, 0);
-
-        for (int i = 0; i < 250000; i++)
-        {
-            /* code */
-        }
+            
+        } */
+        //vTaskDelay(1);
     }
+
+    vTaskDelete(NULL);
 }
 
 void RedTask(void *argument)
 {
     while (1)
     {
+        GPIO_write_pin(GPIOB, 12, 0);
         GPIO_write_pin(GPIOB, 1, 1);
-
-        for (int i = 0; i < 100000; i++)
-        {
-            /* code */
-        }
-
-        GPIO_write_pin(GPIOB, 1, 0);
-
-        for (int i = 0; i < 100000; i++)
-        {
-            /* code */
-        }
+        //vTaskDelay(1);
     }
+    vTaskDelete(NULL);
 }
 
 void SysClk_init()
