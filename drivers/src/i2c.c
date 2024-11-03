@@ -1,17 +1,33 @@
 #include "i2c.h"
 
+// TODO: COMMENTS
 /**
  * @brief Initialize I2C module.
  *
- * @param I2C_base Base address for I2C module.
+ * @param i2c_base Base address for I2C module.
  */
-void I2C_init(I2C_TypeDef *I2C_base)
+void I2C_init(I2C_init_t *i2c_init_handle)
 {
-    I2C_pins_cfg((uint32_t)I2C_base);
-    I2C_base->CR2 |= PCLK1;               // Set system FREQ = 8MHz
-    I2C_base->CCR |= 5000 / TPCLK1;       // Set I2C frequency = 100 KHz
-    I2C_base->TRISE |= 1000 / TPCLK1 + 1; // Set min TRISE = 1000 ns
-    I2C_base->CR1 |= (1 << 0);            // Enable I2C
+    I2C_TypeDef *i2c_base = i2c_init_handle->i2c_base;
+    I2C_pins_cfg((uint32_t)i2c_base);
+
+    switch (i2c_init_handle->mode)
+    {
+    case I2C_MODE_INTERRUPT:
+        // TODO: implement I2C in interrupt mode.
+    break;
+
+    case I2C_MODE_DMA:
+        i2c_base->CR2 |= (1<<11); // DMAEN
+    break;
+
+    default:
+        i2c_base->CR2 |= PCLK1;               // Set system FREQ = 8MHz
+        i2c_base->CCR |= 5000 / TPCLK1;       // Set I2C frequency = 100 KHz
+        i2c_base->TRISE |= 1000 / TPCLK1 + 1; // Set min TRISE = 1000 ns
+        i2c_base->CR1 |= (1 << 0);            // Enable I2C
+        break;
+    }
 }
 
 void I2C_pins_cfg(uint32_t I2C_base)
